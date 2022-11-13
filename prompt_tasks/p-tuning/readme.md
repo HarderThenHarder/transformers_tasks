@@ -1,7 +1,7 @@
 ### P-tuning：Auto Learning prompt pattern
 ---
 
-P-tuning 是 prompt learning 下的一个重要分支，关于 P-tuning 的详细介绍在：[这里]()。
+P-tuning 是 prompt learning 下的一个重要分支，关于 P-tuning 的详细介绍在：[这里](https://zhuanlan.zhihu.com/p/583022692)。
 
 
 ### 1. 环境安装
