@@ -1,0 +1,11 @@
+python p_tuning.py \
+    --model "bert-base-chinese" \
+    --train_path "data/comment_classify/train.txt" \
+    --dev_path "data/comment_classify/dev.txt" \
+    --save_dir "checkpoints/comment_classify/" \
+    --batch_size 16 \
+    --max_seq_len 128 \
+    --valid_steps 20  \
+    --logging_steps 5 \
+    --num_train_epochs 50 \
+    --device "cuda:0"
