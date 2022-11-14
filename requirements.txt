@@ -1,6 +1,7 @@
-torch==1.7.1
+torch
 transformers==4.22.1
 datasets==2.4.0
 evaluate==0.2.2
 matplotlib==3.6.0
 rich==12.5.1
+scikit-learn==1.1.2
