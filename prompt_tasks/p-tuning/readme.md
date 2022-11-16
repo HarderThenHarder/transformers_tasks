@@ -36,7 +36,7 @@ python p_tuning.py \
     --train_path "data/comment_classify/train.txt" \
     --dev_path "data/comment_classify/dev.txt" \
     --save_dir "checkpoints/comment_classify/" \
-    --img_log_dir "logs/predicate_generate" \   # loss曲线图存放地址
+    --img_log_dir "logs/comment_classify" \     # loss曲线图存放地址
     --img_log_name "BERT" \                     # loss曲线图文件名
     --batch_size 16 \
     --max_seq_len 128 \
