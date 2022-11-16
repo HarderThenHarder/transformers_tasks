@@ -3,9 +3,12 @@ python p_tuning.py \
     --train_path "data/comment_classify/train.txt" \
     --dev_path "data/comment_classify/dev.txt" \
     --save_dir "checkpoints/comment_classify/" \
+    --img_log_dir "logs/comment_classify" \
+    --img_log_name "BERT" \
     --batch_size 16 \
     --max_seq_len 128 \
     --valid_steps 20  \
     --logging_steps 5 \
     --num_train_epochs 50 \
+    --max_label_len 2 \
     --device "cuda:0"

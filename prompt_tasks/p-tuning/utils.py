@@ -30,7 +30,8 @@ import numpy as np
 def convert_example(
     examples: dict, 
     tokenizer, 
-    max_seq_len: int, 
+    max_seq_len: int,
+    max_label_len: int,
     p_embedding_num=6
     ) -> dict:
     """
@@ -44,6 +45,7 @@ def convert_example(
                                                             ...
                                                 ]
                                             }
+        max_label_len (int): 最大label长度，若没有达到最大长度，则padding为最大长度
         p_embedding_num (int): p-tuning token 的个数
 
     Returns:
@@ -57,6 +59,7 @@ def convert_example(
     tokenized_output = {
             'input_ids': [], 
             'token_type_ids': [],
+            'attention_mask': [],
             'mask_positions': [],                                           # 记录label的位置（即MASK Token的位置）
             'mask_labels': []                                               # 记录MASK Token的原始值（即Label值）
         }
@@ -75,8 +78,7 @@ def convert_example(
             continue
 
         input_ids = encoded_inputs['input_ids']
-        label_length = len(label)
-        mask_tokens = ['[MASK]'] * label_length                                             # 1.生成 MASK Tokens, 和label长度一致
+        mask_tokens = ['[MASK]'] * max_label_len                                            # 1.生成 MASK Tokens, 和label长度一致
         mask_ids = tokenizer.convert_tokens_to_ids(mask_tokens)                             # token 转 id
 
         p_tokens = ["[unused{}]".format(i+1) for i in range(p_embedding_num)]               # 2.构建 prompt token(s)
@@ -90,17 +92,18 @@ def convert_example(
         input_ids = p_tokens_ids + input_ids                                                # 4.插入 prompt -> [unused1][unused2]...[CLS][MASK]...[SEP]
 
         mask_positions = [len(p_tokens_ids) + start_mask_position + i for                   # 将 Mask Tokens 的位置记录下来
-                            i in range(label_length)]
+                            i in range(max_label_len)]
         
         mask_labels = tokenizer(
             text=label,
-            truncation=True,
-            max_length=max_seq_len
+            truncation=True
         )                                                                        # label token 转 id
         mask_labels = mask_labels['input_ids'][1:-1]                             # 丢掉[CLS]和[SEP]
-
+        PAD_TOKEN_ID = tokenizer.convert_tokens_to_ids(['[PAD]'])[0]
+        mask_labels += [PAD_TOKEN_ID] * (max_label_len - len(mask_labels))       # 将 label 补到最长
         tokenized_output['input_ids'].append(input_ids)
         tokenized_output['token_type_ids'].append(encoded_inputs['token_type_ids'])
+        tokenized_output['attention_mask'].append(encoded_inputs['attention_mask'])
         tokenized_output['mask_positions'].append(mask_positions)
         tokenized_output['mask_labels'].append(mask_labels)
 
@@ -114,7 +117,7 @@ def convert_inputs(
     contents: List[str], 
     tokenizer, 
     max_seq_len: int,
-    label_length: int, 
+    max_label_len: int, 
     p_embedding_num=6
     ) -> dict:
     """
@@ -122,7 +125,7 @@ def convert_inputs(
 
     Args:
         content (List[str]): 原始句子列表 -> e.g. ['电脑很卡，不建议购买', '蛋糕很好吃，下次还买']
-        label_length (int): 标签span的长度
+        max_label_len (int): 标签span的最大长度
         p_embedding_num (int): p-tuning token 的个数
 
     Returns:
@@ -135,6 +138,7 @@ def convert_inputs(
     tokenized_output = {
             'input_ids': [], 
             'token_type_ids': [],
+            'attention_mask': [],
             'mask_positions': []                                        # 记录label的位置（即MASK Token的位置）
         }
 
@@ -147,7 +151,7 @@ def convert_inputs(
             padding='max_length')
 
         input_ids = encoded_inputs['input_ids']
-        mask_tokens = ['[MASK]'] * label_length                                             # 1.生成 MASK Tokens, 和label长度一致
+        mask_tokens = ['[MASK]'] * max_label_len                                            # 1.生成 MASK Tokens, 和label长度一致
         mask_ids = tokenizer.convert_tokens_to_ids(mask_tokens)                             # token 转 id
 
         p_tokens = ["[unused{}]".format(i+1) for i in range(p_embedding_num)]               # 2.构建 prompt token(s)
@@ -161,10 +165,11 @@ def convert_inputs(
         input_ids = p_tokens_ids + input_ids                                                # 4.插入 prompt -> [unused1][unused2]...[CLS][MASK]...[SEP]
 
         mask_positions = [len(p_tokens_ids) + start_mask_position + i for                   # 将 Mask Tokens 的位置记录下来
-                            i in range(label_length)]
+                            i in range(max_label_len)]
 
         tokenized_output['input_ids'].append(input_ids)
         tokenized_output['token_type_ids'].append(encoded_inputs['token_type_ids'])
+        tokenized_output['attention_mask'].append(encoded_inputs['attention_mask'])
         tokenized_output['mask_positions'].append(mask_positions)
 
     for k, v in tokenized_output.items():

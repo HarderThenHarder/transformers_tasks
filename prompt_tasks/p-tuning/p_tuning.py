@@ -41,13 +41,12 @@ from transformers import AutoModelForMaskedLM, AutoTokenizer, default_data_colla
 
 from iTrainingLogger import iSummaryWriter
 from span_metrics import SpanEvaluator
+from RDropLoss import RDropLoss
 from utils import convert_example, mlm_loss, convert_logits_to_ids
 
 
-writer = iSummaryWriter(log_path='logs/sentiment_classification', log_name='BERT')
-
 parser = argparse.ArgumentParser()
-parser.add_argument("--model", default='bert-base-chinses', type=str, help="backbone of encoder.")
+parser.add_argument("--model", default='bert-base-chinese', type=str, help="backbone of encoder.")
 parser.add_argument("--train_path", default=None, type=str, help="The path of train set.")
 parser.add_argument("--dev_path", default=None, type=str, help="The path of dev set.")
 parser.add_argument("--save_dir", default="./checkpoints", type=str, required=False, help="The output directory where the model predictions and checkpoints will be written.")
@@ -61,9 +60,14 @@ parser.add_argument("--warmup_ratio", default=0.06, type=float, help="Linear war
 parser.add_argument("--valid_steps", default=200, type=int, required=False, help="evaluate frequecny.")
 parser.add_argument("--logging_steps", default=10, type=int, help="log interval.")
 parser.add_argument('--device', default="cuda:0", help="Select which device to train model, defaults to gpu.")
-parser.add_argument("--p_embedding_num", type=int, default=1, help="number of p-embedding")
+parser.add_argument("--p_embedding_num", type=int, default=6, help="number of p-embedding")
+parser.add_argument("--max_label_len", type=int, default=6, help="max length of label")
 parser.add_argument("--rdrop_coef", default=0.0, type=float, help="The coefficient of KL-Divergence loss in R-Drop paper, for more detail please refer to https://arxiv.org/abs/2106.14448), if rdrop_coef > 0 then R-Drop works")
+parser.add_argument("--img_log_dir", default='logs', type=str, help="Logging image path.")
+parser.add_argument("--img_log_name", default='Model Performance', type=str, help="Logging image file name.")
 args = parser.parse_args()
+
+writer = iSummaryWriter(log_path=args.img_log_dir, log_name=args.img_log_name)
 
 
 def evaluate_model(model, metric, data_loader, global_step):
@@ -99,7 +103,12 @@ def train():
                                                 'dev': args.dev_path})    
     print(dataset)
     print(dataset['train'])
-    convert_func = partial(convert_example, tokenizer=tokenizer, max_seq_len=args.max_seq_len)
+    convert_func = partial(convert_example, 
+                            tokenizer=tokenizer, 
+                            max_seq_len=args.max_seq_len,
+                            max_label_len=args.max_label_len,
+                            p_embedding_num=args.p_embedding_num
+                            )
     dataset = dataset.map(convert_func, batched=True)
     
     train_dataset = dataset["train"]
@@ -136,18 +145,27 @@ def train():
     tic_train = time.time()
     metric = SpanEvaluator()
     criterion = torch.nn.CrossEntropyLoss()
+    rdrop_loss = RDropLoss()
     global_step, best_f1 = 0, 0
     for epoch in range(args.num_train_epochs):
         for batch in train_dataloader:
             logits = model(input_ids=batch['input_ids'].to(args.device),
                             token_type_ids=batch['token_type_ids'].to(args.device)).logits
             mask_labels = batch['mask_labels'].to(args.device)
-            loss = mlm_loss(logits, 
-                            batch['mask_positions'].to(args.device), 
-                            mask_labels, 
-                            criterion,
-                            1.0,
-                            args.device)
+            if args.rdrop_coef > 0:
+                logits2 = model(input_ids=batch['input_ids'].to(args.device),
+                            token_type_ids=batch['token_type_ids'].to(args.device)).logits
+                ce_loss = (mlm_loss(logits, batch['mask_positions'].to(args.device), mask_labels, criterion, 1.0, args.device) + \
+                            mlm_loss(logits2, batch['mask_positions'].to(args.device), mask_labels, criterion, 1.0, args.device)) / 2
+                kl_loss = rdrop_loss.compute_kl_loss(logits, logits2, device=args.device)
+                loss = ce_loss + kl_loss * args.rdrop_coef
+            else:
+                loss = mlm_loss(logits, 
+                                batch['mask_positions'].to(args.device), 
+                                mask_labels, 
+                                criterion,
+                                1.0,
+                                args.device)
             loss.backward()
             optimizer.step()
             lr_scheduler.step()

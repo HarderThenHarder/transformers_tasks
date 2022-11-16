@@ -24,7 +24,7 @@ pip install -r ../../requirements.txt
 
 每一行用 `\t` 分隔符分开，前半部分为`标签（label）`，后半部分为`原始输入`。
 
-> Note: 数据中所有的标签必须拥有「相同长度」！不能出现标签长度不同的情况：例如 -> '计算机'、'水果'...，遇到标签长度不等情况时需要先将标签数据处理为等长再训练。
+> Note: 数据中所有的标签尽量不要出现「不同长度」的情况：例如 -> '计算机'、'水果'...，如果遇到标签长度不等情况时，记得在训练参数中添加上标签最大长度，模型会自动将label padding为参数中设置的最大长度。
 
 
 ### 3. 模型训练
@@ -32,16 +32,19 @@ pip install -r ../../requirements.txt
 
 ```sh
 python p_tuning.py \
-    --model "bert-base-chinese" \   # backbone
+    --model "bert-base-chinese" \               # backbone
     --train_path "data/comment_classify/train.txt" \
     --dev_path "data/comment_classify/dev.txt" \
     --save_dir "checkpoints/comment_classify/" \
+    --img_log_dir "logs/predicate_generate" \   # loss曲线图存放地址
+    --img_log_name "BERT" \                     # loss曲线图文件名
     --batch_size 16 \
     --max_seq_len 128 \
     --valid_steps 20  \
     --logging_steps 5 \
     --num_train_epochs 50 \
-    --device "cuda:0"              # 指定使用哪块gpu
+    --max_label_len 6 \                         # 标签最大长度
+    --device "cuda:0"                           # 指定使用哪块gpu
 ```
 正确开启训练后，终端会打印以下信息：
 

@@ -31,7 +31,7 @@ from utils import convert_inputs, convert_logits_to_ids
 
 from rich import print
 
-device = "cuda:1"
+device = "cuda:0"
 model_path = "checkpoints/comment_classify/model_best"
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModelForMaskedLM.from_pretrained(model_path)
@@ -47,22 +47,25 @@ def inference(contents: List[str]):
     """
     with torch.no_grad():
         start_time = time.time()
-        tokenized_output = convert_inputs(
-            contents, tokenizer, max_seq_len=128, label_length=2
-        )
+        tokenized_output = convert_inputs(contents, 
+                                        tokenizer, 
+                                        max_seq_len=128,
+                                        max_label_len=6,
+                                        p_embedding_num=6)
         logits = model(
-            input_ids=tokenized_output["input_ids"].to(device),
-            token_type_ids=tokenized_output["token_type_ids"].to(device),
-        ).logits
-        predictions = convert_logits_to_ids(logits, tokenized_output["mask_positions"])
+            input_ids=tokenized_output['input_ids'].to(device),
+            token_type_ids=tokenized_output['token_type_ids'].to(device)).logits
+        predictions = convert_logits_to_ids(logits, tokenized_output['mask_positions'])
         label_tokens = []
-
+        
         for prediction in predictions.detach().cpu().numpy().tolist():
-            print(prediction)
-            label_tokens.append("".join(tokenizer.convert_ids_to_tokens(prediction)))
+            PAD_TOKEN_ID = tokenizer.convert_tokens_to_ids(['[PAD]'])[0]
+            while PAD_TOKEN_ID in prediction:                               # 移除label中的 [PAD] token
+                prediction.remove(PAD_TOKEN_ID)
+            label_tokens.append(''.join(tokenizer.convert_ids_to_tokens(prediction)))
+        
         used = time.time() - start_time
-
-        print(f"Used {used}s.")
+        print(f'Used {used}s.')
         return label_tokens
 
 
