@@ -15,10 +15,9 @@
 │      └───┴─────┴───────────────────────┴─────┴───┘          │
 └─────────────────────────────────────────────────────────────┘
 
-Copyright (c) 2022 ByteDance.com, Inc. All Rights Reserved
 （多）分类问题下的指标评估（acc, precision, recall, f1）。
 
-Author: pankeyu(pankeyu@bytedance.com)
+Author: pankeyu
 Date: 2022/11/20
 """
 from typing import List
