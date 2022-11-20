@@ -1,14 +1,13 @@
-### 文本匹配任务（Text Matching）
+## 文本匹配任务（Text Matching）
 
----
 
 文本匹配多用于计算两个文本之间的相似度，关于文本匹配的详细介绍在：[这里]()。
 
 本项目对3种常用的文本匹配的方法进行实现：PointWise（单塔）、DSSM（双塔）、Sentence BERT（双塔）。
 
-### 1. PointWise（单塔）
 
-#### 1.1 环境安装
+
+## 1. 环境安装
 
 本项目基于 `pytorch` + `transformers` 实现，运行前请安装相关依赖包：
 
@@ -16,7 +15,7 @@
 pip install -r ../requirements.txt
 ```
 
-#### 1.2 数据集准备
+## 2. 数据集准备
 
 项目中提供了一部分示例数据，我们使用「商品评论」和「商品类别」来进行文本匹配任务，数据在 `data/comment_classify` 。
 
@@ -30,7 +29,13 @@ pip install -r ../requirements.txt
 
 每一行用 `\t` 分隔符分开，第一部分部分为`商品类型（text1）`，中间部分为`商品评论（text2）`，最后一部分为`商品评论和商品类型是否一致（label）`。
 
-#### 1.3 模型训练
+
+## 3. 模型训练
+
+### 3.1 PointWise（单塔） 
+
+#### 3.1.1 模型训练
+
 修改训练脚本 `train_pointwise.sh` 里的对应参数, 开启模型训练：
 
 ```sh
@@ -72,9 +77,9 @@ best F1 performence has been updated: 0.88152 --> 0.93659
 
 在 `logs/comment_classify` 文件下将会保存训练曲线图：
 
-<img src='assets/train_log.png'></img>
+<img src='assets/pointwise_train_log.png'></img>
 
-#### 1.4 模型预测
+#### 3.1.2 模型推理
 
 完成模型训练后，运行 `inference_pointwise.py` 以加载训练好的模型并应用：
 
@@ -100,6 +105,48 @@ python inference_pointwise.py
 tensor([[ 1.8477, -2.0484]], device='cuda:0')   # 两句话不相似(0)的概率更大
 ```
 
-### 2. DSSM（双塔）
+### 3.2 DSSM（双塔）
+
+#### 3.2.1 模型训练
+
+修改训练脚本 `train_dssm.sh` 里的对应参数, 开启模型训练：
+
+```sh
+python train_dssm.py \
+    --model "nghuyong/ernie-3.0-base-zh" \
+    --train_path "data/comment_classify/train.txt" \
+    --dev_path "data/comment_classify/dev.txt" \
+    --save_dir "checkpoints/comment_classify/dssm" \
+    --img_log_dir "logs/comment_classify" \
+    --img_log_name "ERNIE-DSSM" \
+    --batch_size 8 \
+    --max_seq_len 256 \
+    --valid_steps 50 \
+    --logging_steps 10 \
+    --num_train_epochs 10 \
+    --device "cuda:0"
+```
+
+正确开启训练后，终端会打印以下信息：
+
+```sh
+...
+global step 0, epoch: 1, loss: 0.62319, speed: 15.16 step/s
+Evaluation precision: 0.29912, recall: 0.96226, F1: 0.45638
+best F1 performence has been updated: 0.00000 --> 0.45638
+global step 10, epoch: 1, loss: 0.40931, speed: 3.64 step/s
+global step 20, epoch: 1, loss: 0.36969, speed: 3.69 step/s
+global step 30, epoch: 1, loss: 0.33927, speed: 3.69 step/s
+global step 40, epoch: 1, loss: 0.31732, speed: 3.70 step/s
+global step 50, epoch: 1, loss: 0.30996, speed: 3.68 step/s
+...
+```
+
+在 `logs/comment_classify` 文件下将会保存训练曲线图：
+
+<img src='assets/dssm_train_log.png'></img>
+
+#### 3.2.2 模型推理
+
 
 ### 3. Sentence BERT（双塔）
