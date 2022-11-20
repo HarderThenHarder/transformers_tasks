@@ -41,14 +41,15 @@ class ClassEvaluator(object):
         添加一个batch中的prediction和gold列表，用于后续统一计算。
 
         Args:
-            pred_batch (list): 模型预测标签列表, e.g. -> [[0], [0], [1], [2], [0], ...] or [['体', '育'], ['财', '经'], ...]
-            gold_batch (list): 真实标签标签列表, e.g. -> [[1], [0], [1], [2], [0], ...] or [['体', '育'], ['财', '经'], ...]
+            pred_batch (list): 模型预测标签列表, e.g. -> [0, 0, 1, 2, 0, ...] or [['体', '育'], ['财', '经'], ...]
+            gold_batch (list): 真实标签标签列表, e.g. -> [1, 0, 1, 2, 0, ...] or [['体', '育'], ['财', '经'], ...]
         """
         assert len(pred_batch) == len(gold_batch), \
             f"@params pred_spans_batch(len: {len(pred_batch)}) does not match @param gold_spans_batch(len: {len(gold_batch)})"
-        
-        pred_batch = [''.join([str(e) for e in ele]) for ele in pred_batch]          # 将所有的label拼接为一个整label: ['体', '育'] -> '体育'
-        gold_batch = [''.join([str(e) for e in ele]) for ele in gold_batch]
+
+        if type(gold_batch[0]) in [list, tuple]:                                    # 若遇到多个子标签构成一个标签的情况
+            pred_batch = [''.join([str(e) for e in ele]) for ele in pred_batch]     # 将所有的label拼接为一个整label: ['体', '育'] -> '体育'
+            gold_batch = [''.join([str(e) for e in ele]) for ele in gold_batch]
         self.goldens.extend(gold_batch)
         self.predictions.extend(pred_batch)
 
@@ -105,12 +106,12 @@ if __name__ == '__main__':
     from rich import print
 
     metric = ClassEvaluator()
+    # metric.add_batch(
+    #     [['财', '经'], ['财', '经'], ['体', '育'], ['体', '育'], ['计', '算', '机']],
+    #     [['体', '育'], ['财', '经'], ['体', '育'], ['计', '算', '机'], ['计', '算', '机']],
+    # )
     metric.add_batch(
-        [['财', '经'], ['财', '经'], ['体', '育'], ['体', '育'], ['计', '算', '机']],
-        [['体', '育'], ['财', '经'], ['体', '育'], ['计', '算', '机'], ['计', '算', '机']],
-    )
-    metric.add_batch(
-        [[0], [0], [1], [1], [0]],
-        [[1], [1], [1], [0], [0]]
+        [0, 0, 1, 1, 0],
+        [1, 1, 1, 0, 0]
     )
     print(metric.compute())
