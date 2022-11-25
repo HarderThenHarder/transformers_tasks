@@ -1,0 +1,160 @@
+{"content": "9月3日2点18分，加班打车回家，25元", "result_list": [{"text": "家", "start": 15, "end": 16}], "prompt": "目的地"}
+{"content": "6月1日交通费68元", "result_list": [], "prompt": "出发地"}
+{"content": "上海到北京机票1320元", "result_list": [], "prompt": "时间"}
+{"content": "城市内交通费6月22日佛山至广州93元", "result_list": [{"text": "佛山", "start": 11, "end": 13}], "prompt": "出发地"}
+{"content": "八月十三号晚上十点零七分加班，打车回家三十元", "result_list": [{"text": "八月十三号晚上十点零七分", "start": 0, "end": 12}], "prompt": "时间"}
+{"content": "上周末坐动车从北京到上海花费五十块五毛", "result_list": [{"text": "上周末", "start": 0, "end": 3}], "prompt": "时间"}
+{"content": "上周末坐动车从北京到上海花费五十块五毛", "result_list": [{"text": "北京", "start": 7, "end": 9}], "prompt": "出发地"}
+{"content": "城市内交通费6月22日佛山至广州93元", "result_list": [{"text": "93", "start": 16, "end": 18}], "prompt": "费用"}
+{"content": "上周从北京飞往上海花费一百元", "result_list": [{"text": "北京", "start": 3, "end": 5}], "prompt": "出发地"}
+{"content": "上海虹桥到杭州东站高铁g7555共73元时间是10月14日", "result_list": [{"text": "73", "start": 17, "end": 19}], "prompt": "费用"}
+{"content": "1月22日交通费33元拜访客户", "result_list": [{"text": "1月22日", "start": 0, "end": 5}], "prompt": "时间"}
+{"content": "昨天晚上十点加班打车回家58元", "result_list": [{"text": "昨天晚上十点", "start": 0, "end": 6}], "prompt": "时间"}
+{"content": "上周末坐动车从北京到上海花费五十块五毛", "result_list": [{"text": "五十块五", "start": 14, "end": 18}], "prompt": "费用"}
+{"content": "八月二十七号晚上十点零八分加班，打车回家，三十三块五", "result_list": [{"text": "家", "start": 19, "end": 20}], "prompt": "目的地"}
+{"content": "上海虹桥高铁到杭州时间是9月24日费用是73元", "result_list": [{"text": "杭州", "start": 7, "end": 9}], "prompt": "目的地"}
+{"content": "城市内交通费7月5日金额114广州至佛山", "result_list": [{"text": "广州", "start": 15, "end": 17}], "prompt": "出发地"}
+{"content": "6月10日加班打车回家25元", "result_list": [{"text": "6月10日", "start": 0, "end": 5}], "prompt": "时间"}
+{"content": "5月27日交通费十九元从立水桥到朝来家园", "result_list": [{"text": "5月27日", "start": 0, "end": 5}], "prompt": "时间"}
+{"content": "9月3日2点18分，加班打车回家，25元", "result_list": [{"text": "25", "start": 17, "end": 19}], "prompt": "费用"}
+{"content": "上海虹桥到杭州东站高铁g7555共73元时间是10月14日", "result_list": [{"text": "上海虹桥", "start": 0, "end": 4}], "prompt": "出发地"}
+{"content": "6月10日加班打车回家25元", "result_list": [{"text": "家", "start": 10, "end": 11}], "prompt": "目的地"}
+{"content": "4月16日48元往返机场交通费", "result_list": [{"text": "4月16日", "start": 0, "end": 5}], "prompt": "时间"}
+{"content": "10月16日高铁从杭州到上海南站车次d5414共48元", "result_list": [{"text": "10月16日", "start": 0, "end": 6}], "prompt": "时间"}
+{"content": "城市内交通费7月5日金额114广州至佛山", "result_list": [{"text": "佛山", "start": 18, "end": 20}], "prompt": "目的地"}
+{"content": "上海到苏州火车票59块五", "result_list": [{"text": "59块五", "start": 8, "end": 12}], "prompt": "费用"}
+{"content": "上海到北京机票1320元", "result_list": [{"text": "上海", "start": 0, "end": 2}], "prompt": "出发地"}
+{"content": "去苏州高铁站七十二元", "result_list": [], "prompt": "时间"}
+{"content": "2月20号从南山到光明二十元", "result_list": [{"text": "光明", "start": 9, "end": 11}], "prompt": "目的地"}
+{"content": "上海到苏州火车票59块五", "result_list": [], "prompt": "时间"}
+{"content": "上海虹桥高铁到杭州时间是9月24日费用是73元", "result_list": [{"text": "73", "start": 20, "end": 22}], "prompt": "费用"}
+{"content": "三月三号早上12点46加班，到公司54", "result_list": [], "prompt": "出发地"}
+{"content": "5月12日22点36分加班打车回家41元", "result_list": [{"text": "家", "start": 16, "end": 17}], "prompt": "目的地"}
+{"content": "5月9日交通费29元从北苑到望京搜后", "result_list": [{"text": "北苑", "start": 11, "end": 13}], "prompt": "出发地"}
+{"content": "9月28日高铁上海虹桥到合肥南站共192点五元", "result_list": [{"text": "上海虹桥", "start": 7, "end": 11}], "prompt": "出发地"}
+{"content": "南京到上海，十月十七号高铁票，一百三十四块五", "result_list": [{"text": "上海", "start": 3, "end": 5}], "prompt": "目的地"}
+{"content": "2月20号从南山到光明二十元", "result_list": [{"text": "二十", "start": 11, "end": 13}], "prompt": "费用"}
+{"content": "城市内交通费6月22日佛山至广州93元", "result_list": [{"text": "6月22日", "start": 6, "end": 11}], "prompt": "时间"}
+{"content": "2019年1月16日0点06分打车回家，27元", "result_list": [{"text": "27", "start": 20, "end": 22}], "prompt": "费用"}
+{"content": "上海到苏州火车票59块五", "result_list": [{"text": "上海", "start": 0, "end": 2}], "prompt": "出发地"}
+{"content": "5月31号晚上10点54分打车回家49元", "result_list": [{"text": "5月31号晚上10点54分", "start": 0, "end": 13}], "prompt": "时间"}
+{"content": "八月二十七号晚上十点零八分加班，打车回家，三十三块五", "result_list": [{"text": "三十三块五", "start": 21, "end": 26}], "prompt": "费用"}
+{"content": "上海虹桥到杭州东站高铁g7555共73元时间是10月14日", "result_list": [{"text": "杭州东站", "start": 5, "end": 9}], "prompt": "目的地"}
+{"content": "昨天晚上十点加班打车回家58元", "result_list": [], "prompt": "出发地"}
+{"content": "10月22日从公司到首都机场38元过路费", "result_list": [{"text": "38", "start": 14, "end": 16}], "prompt": "费用"}
+{"content": "9月23日北京南站到青岛站的高铁票", "result_list": [{"text": "9月23日", "start": 0, "end": 5}], "prompt": "时间"}
+{"content": "2019年1月16日0点06分打车回家，27元", "result_list": [], "prompt": "出发地"}
+{"content": "去首都机场高速费十四块五", "result_list": [{"text": "首都机场", "start": 1, "end": 5}], "prompt": "目的地"}
+{"content": "2月20号从南山到光明二十元", "result_list": [{"text": "2月20号", "start": 0, "end": 5}], "prompt": "时间"}
+{"content": "昨天晚上十点加班打车回家58元", "result_list": [{"text": "家", "start": 11, "end": 12}], "prompt": "目的地"}
+{"content": "4月16日48元往返机场交通费", "result_list": [], "prompt": "出发地"}
+{"content": "2009年1月份通讯费一百元", "result_list": [{"text": "一百", "start": 11, "end": 13}], "prompt": "费用"}
+{"content": "从北京飞往上海出差飞机票费150元", "result_list": [{"text": "北京", "start": 1, "end": 3}], "prompt": "出发地"}
+{"content": "6月1日交通费68元", "result_list": [], "prompt": "目的地"}
+{"content": "八月二十七号晚上十点零八分加班，打车回家，三十三块五", "result_list": [], "prompt": "出发地"}
+{"content": "出差住宿费6月22日至6月26日住宿天数四田金额1024斌", "result_list": [], "prompt": "目的地"}
+{"content": "5月9日交通费29元从北苑到望京搜后", "result_list": [{"text": "29", "start": 7, "end": 9}], "prompt": "费用"}
+{"content": "深大到双龙28块钱4月24号交通费", "result_list": [{"text": "28", "start": 5, "end": 7}], "prompt": "费用"}
+{"content": "2月20号从南山到光明二十元", "result_list": [{"text": "南山", "start": 6, "end": 8}], "prompt": "出发地"}
+{"content": "10月16日高铁从杭州到上海南站车次d5414共48元", "result_list": [{"text": "48", "start": 24, "end": 26}], "prompt": "费用"}
+{"content": "6月1日交通费68元", "result_list": [{"text": "68", "start": 7, "end": 9}], "prompt": "费用"}
+{"content": "5月27日交通费十九元从立水桥到朝来家园", "result_list": [{"text": "十九", "start": 8, "end": 10}], "prompt": "费用"}
+{"content": "4月7日往返机场交通费66点五元", "result_list": [], "prompt": "出发地"}
+{"content": "2019年1月16日0点06分打车回家，27元", "result_list": [{"text": "家", "start": 18, "end": 19}], "prompt": "目的地"}
+{"content": "8月31号十一点零四工作加班五十块钱", "result_list": [{"text": "8月31号十一点零四", "start": 0, "end": 10}], "prompt": "时间"}
+{"content": "城市内交通费7月5日金额114广州至佛山", "result_list": [{"text": "114", "start": 12, "end": 15}], "prompt": "费用"}
+{"content": "南京到上海，十月十七号高铁票，一百三十四块五", "result_list": [{"text": "十月十七号", "start": 6, "end": 11}], "prompt": "时间"}
+{"content": "1月22日交通费33元拜访客户", "result_list": [], "prompt": "出发地"}
+{"content": "出租车从酒店到公司一共34元时间是10月21日", "result_list": [{"text": "34", "start": 11, "end": 13}], "prompt": "费用"}
+{"content": "10月22日从公司到首都机场38元过路费", "result_list": [{"text": "公司", "start": 7, "end": 9}], "prompt": "出发地"}
+{"content": "去首都机场高速费十四块五", "result_list": [{"text": "十四块五", "start": 8, "end": 12}], "prompt": "费用"}
+{"content": "4月7日往返机场交通费66点五元", "result_list": [{"text": "机场", "start": 6, "end": 8}], "prompt": "目的地"}
+{"content": "4月16日48元往返机场交通费", "result_list": [{"text": "机场", "start": 10, "end": 12}], "prompt": "目的地"}
+{"content": "8月31号十一点零四工作加班五十块钱", "result_list": [], "prompt": "目的地"}
+{"content": "5月9日交通费29元从北苑到望京搜后", "result_list": [{"text": "望京搜后", "start": 14, "end": 18}], "prompt": "目的地"}
+{"content": "2009年1月份通讯费一百元", "result_list": [], "prompt": "目的地"}
+{"content": "出租车从酒店到公司一共34元时间是10月21日", "result_list": [{"text": "10月21日", "start": 17, "end": 23}], "prompt": "时间"}
+{"content": "从北京到合肥高铁票6月21日金额1377元", "result_list": [{"text": "合肥", "start": 4, "end": 6}], "prompt": "目的地"}
+{"content": "5月9日交通费29元从北苑到望京搜后", "result_list": [{"text": "5月9日", "start": 0, "end": 4}], "prompt": "时间"}
+{"content": "5月12日22点36分加班打车回家41元", "result_list": [{"text": "41", "start": 17, "end": 19}], "prompt": "费用"}
+{"content": "八月二十七号晚上十点零八分加班，打车回家，三十三块五", "result_list": [{"text": "八月二十七号晚上十点零八分", "start": 0, "end": 13}], "prompt": "时间"}
+{"content": "深大到双龙28块钱4月24号交通费", "result_list": [{"text": "双龙", "start": 3, "end": 5}], "prompt": "目的地"}
+{"content": "从北京到合肥高铁票6月21日金额1377元", "result_list": [{"text": "6月21日", "start": 9, "end": 14}], "prompt": "时间"}
+{"content": "从北京到合肥高铁票6月21日金额1377元", "result_list": [{"text": "北京", "start": 1, "end": 3}], "prompt": "出发地"}
+{"content": "8月31号十一点零四工作加班五十块钱", "result_list": [], "prompt": "出发地"}
+{"content": "5月31号晚上10点54分打车回家49元", "result_list": [{"text": "家", "start": 16, "end": 17}], "prompt": "目的地"}
+{"content": "南京到上海，十月十七号高铁票，一百三十四块五", "result_list": [{"text": "一百三十四块五", "start": 15, "end": 22}], "prompt": "费用"}
+{"content": "三月三号早上12点46加班，到公司54", "result_list": [{"text": "公司", "start": 15, "end": 17}], "prompt": "目的地"}
+{"content": "5月27日交通费十九元从立水桥到朝来家园", "result_list": [{"text": "朝来家园", "start": 16, "end": 20}], "prompt": "目的地"}
+{"content": "5月31号晚上10点54分打车回家49元", "result_list": [], "prompt": "出发地"}
+{"content": "出租车从机场到酒店一共88元时间是10月18号", "result_list": [{"text": "酒店", "start": 7, "end": 9}], "prompt": "目的地"}
+{"content": "八月十三号晚上十点零七分加班，打车回家三十元", "result_list": [{"text": "家", "start": 18, "end": 19}], "prompt": "目的地"}
+{"content": "出租车从机场到酒店一共88元时间是10月18号", "result_list": [{"text": "10月18号", "start": 17, "end": 23}], "prompt": "时间"}
+{"content": "6月2日交通费123元", "result_list": [{"text": "6月2日", "start": 0, "end": 4}], "prompt": "时间"}
+{"content": "6月2日交通费123元", "result_list": [], "prompt": "出发地"}
+{"content": "6月1日交通费68元", "result_list": [{"text": "6月1日", "start": 0, "end": 4}], "prompt": "时间"}
+{"content": "深大到双龙28块钱4月24号交通费", "result_list": [{"text": "深大", "start": 0, "end": 2}], "prompt": "出发地"}
+{"content": "6月10日加班打车回家25元", "result_list": [{"text": "25", "start": 11, "end": 13}], "prompt": "费用"}
+{"content": "9月23日北京南站到青岛站的高铁票", "result_list": [{"text": "青岛站", "start": 10, "end": 13}], "prompt": "目的地"}
+{"content": "去首都机场高速费十四块五", "result_list": [], "prompt": "出发地"}
+{"content": "4月7日往返机场交通费66点五元", "result_list": [{"text": "66点五", "start": 11, "end": 15}], "prompt": "费用"}
+{"content": "从北京飞往上海出差飞机票费150元", "result_list": [{"text": "150", "start": 13, "end": 16}], "prompt": "费用"}
+{"content": "出租车从酒店到公司一共34元时间是10月21日", "result_list": [{"text": "酒店", "start": 4, "end": 6}], "prompt": "出发地"}
+{"content": "上海到北京机票1320元", "result_list": [{"text": "1320", "start": 7, "end": 11}], "prompt": "费用"}
+{"content": "5月31号晚上10点54分打车回家49元", "result_list": [{"text": "49", "start": 17, "end": 19}], "prompt": "费用"}
+{"content": "9月23日北京南站到青岛站的高铁票", "result_list": [{"text": "北京南站", "start": 5, "end": 9}], "prompt": "出发地"}
+{"content": "城市内交通费6月22日佛山至广州93元", "result_list": [{"text": "广州", "start": 14, "end": 16}], "prompt": "目的地"}
+{"content": "深大到双龙28块钱4月24号交通费", "result_list": [{"text": "4月24号", "start": 9, "end": 14}], "prompt": "时间"}
+{"content": "从北京到合肥高铁票6月21日金额1377元", "result_list": [{"text": "1377", "start": 16, "end": 20}], "prompt": "费用"}
+{"content": "上海虹桥到杭州东站高铁g7555共73元时间是10月14日", "result_list": [{"text": "10月14日", "start": 23, "end": 29}], "prompt": "时间"}
+{"content": "4月7日往返机场交通费66点五元", "result_list": [{"text": "4月7日", "start": 0, "end": 4}], "prompt": "时间"}
+{"content": "9月3日2点18分，加班打车回家，25元", "result_list": [], "prompt": "出发地"}
+{"content": "三月三号早上12点46加班，到公司54", "result_list": [{"text": "三月三号早上12点46", "start": 0, "end": 11}], "prompt": "时间"}
+{"content": "9月3日2点18分，加班打车回家，25元", "result_list": [{"text": "9月3日2点18分", "start": 0, "end": 9}], "prompt": "时间"}
+{"content": "昨天晚上十点加班打车回家58元", "result_list": [{"text": "58", "start": 12, "end": 14}], "prompt": "费用"}
+{"content": "去苏州高铁站七十二元", "result_list": [], "prompt": "出发地"}
+{"content": "南京到上海，十月十七号高铁票，一百三十四块五", "result_list": [{"text": "南京", "start": 0, "end": 2}], "prompt": "出发地"}
+{"content": "上周从北京飞往上海花费一百元", "result_list": [], "prompt": "时间"}
+{"content": "6月10日加班打车回家25元", "result_list": [], "prompt": "出发地"}
+{"content": "5月12日22点36分加班打车回家41元", "result_list": [], "prompt": "出发地"}
+{"content": "出差住宿费6月22日至6月26日住宿天数四田金额1024斌", "result_list": [{"text": "6月22日至6月26日", "start": 5, "end": 16}], "prompt": "时间"}
+{"content": "出租车从酒店到公司一共34元时间是10月21日", "result_list": [{"text": "公司", "start": 7, "end": 9}], "prompt": "目的地"}
+{"content": "八月十三号晚上十点零七分加班，打车回家三十元", "result_list": [], "prompt": "出发地"}
+{"content": "三月三号早上12点46加班，到公司54", "result_list": [{"text": "54", "start": 17, "end": 19}], "prompt": "费用"}
+{"content": "去苏州高铁站七十二元", "result_list": [{"text": "苏州高铁站", "start": 1, "end": 6}], "prompt": "目的地"}
+{"content": "出差住宿费6月22日至6月26日住宿天数四田金额1024斌", "result_list": [], "prompt": "出发地"}
+{"content": "上周末坐动车从北京到上海花费五十块五毛", "result_list": [{"text": "上海", "start": 10, "end": 12}], "prompt": "目的地"}
+{"content": "9月28日高铁上海虹桥到合肥南站共192点五元", "result_list": [{"text": "9月28日", "start": 0, "end": 5}], "prompt": "时间"}
+{"content": "5月12日22点36分加班打车回家41元", "result_list": [{"text": "5月12日22点36分", "start": 0, "end": 11}], "prompt": "时间"}
+{"content": "9月28日高铁上海虹桥到合肥南站共192点五元", "result_list": [{"text": "合肥南站", "start": 12, "end": 16}], "prompt": "目的地"}
+{"content": "八月十三号晚上十点零七分加班，打车回家三十元", "result_list": [{"text": "三十", "start": 19, "end": 21}], "prompt": "费用"}
+{"content": "上周从北京飞往上海花费一百元", "result_list": [{"text": "上海", "start": 7, "end": 9}], "prompt": "目的地"}
+{"content": "6月2日交通费123元", "result_list": [], "prompt": "目的地"}
+{"content": "10月16日高铁从杭州到上海南站车次d5414共48元", "result_list": [{"text": "上海南站", "start": 12, "end": 16}], "prompt": "目的地"}
+{"content": "从北京飞往上海出差飞机票费150元", "result_list": [{"text": "上海", "start": 5, "end": 7}], "prompt": "目的地"}
+{"content": "5月27日交通费十九元从立水桥到朝来家园", "result_list": [{"text": "立水桥", "start": 12, "end": 15}], "prompt": "出发地"}
+{"content": "1月22日交通费33元拜访客户", "result_list": [{"text": "33", "start": 8, "end": 10}], "prompt": "费用"}
+{"content": "8月31号十一点零四工作加班五十块钱", "result_list": [{"text": "五十", "start": 14, "end": 16}], "prompt": "费用"}
+{"content": "出差住宿费6月22日至6月26日住宿天数四田金额1024斌", "result_list": [{"text": "1024", "start": 24, "end": 28}], "prompt": "费用"}
+{"content": "1月22日交通费33元拜访客户", "result_list": [], "prompt": "目的地"}
+{"content": "10月22日从公司到首都机场38元过路费", "result_list": [{"text": "10月22日", "start": 0, "end": 6}], "prompt": "时间"}
+{"content": "2019年1月16日0点06分打车回家，27元", "result_list": [{"text": "2019年1月16日0点06分", "start": 0, "end": 15}], "prompt": "时间"}
+{"content": "2009年1月份通讯费一百元", "result_list": [], "prompt": "出发地"}
+{"content": "上海到北京机票1320元", "result_list": [{"text": "北京", "start": 3, "end": 5}], "prompt": "目的地"}
+{"content": "去首都机场高速费十四块五", "result_list": [], "prompt": "时间"}
+{"content": "上海虹桥高铁到杭州时间是9月24日费用是73元", "result_list": [{"text": "上海虹桥", "start": 0, "end": 4}], "prompt": "出发地"}
+{"content": "9月28日高铁上海虹桥到合肥南站共192点五元", "result_list": [{"text": "192点五", "start": 17, "end": 22}], "prompt": "费用"}
+{"content": "2009年1月份通讯费一百元", "result_list": [{"text": "2009年1月", "start": 0, "end": 7}], "prompt": "时间"}
+{"content": "出租车从机场到酒店一共88元时间是10月18号", "result_list": [{"text": "88", "start": 11, "end": 13}], "prompt": "费用"}
+{"content": "城市内交通费7月5日金额114广州至佛山", "result_list": [{"text": "7月5日", "start": 6, "end": 10}], "prompt": "时间"}
+{"content": "4月16日48元往返机场交通费", "result_list": [{"text": "48", "start": 5, "end": 7}], "prompt": "费用"}
+{"content": "上海虹桥高铁到杭州时间是9月24日费用是73元", "result_list": [{"text": "9月24日", "start": 12, "end": 17}], "prompt": "时间"}
+{"content": "上周从北京飞往上海花费一百元", "result_list": [{"text": "一百", "start": 11, "end": 13}], "prompt": "费用"}
+{"content": "9月23日北京南站到青岛站的高铁票", "result_list": [], "prompt": "费用"}
+{"content": "10月16日高铁从杭州到上海南站车次d5414共48元", "result_list": [{"text": "杭州", "start": 9, "end": 11}], "prompt": "出发地"}
+{"content": "从北京飞往上海出差飞机票费150元", "result_list": [], "prompt": "时间"}
+{"content": "去苏州高铁站七十二元", "result_list": [{"text": "七十二", "start": 6, "end": 9}], "prompt": "费用"}
+{"content": "6月2日交通费123元", "result_list": [{"text": "123", "start": 7, "end": 10}], "prompt": "费用"}
+{"content": "出租车从机场到酒店一共88元时间是10月18号", "result_list": [{"text": "机场", "start": 4, "end": 6}], "prompt": "出发地"}
+{"content": "10月22日从公司到首都机场38元过路费", "result_list": [{"text": "首都机场", "start": 10, "end": 14}], "prompt": "目的地"}
+{"content": "上海到苏州火车票59块五", "result_list": [{"text": "苏州", "start": 3, "end": 5}], "prompt": "目的地"}

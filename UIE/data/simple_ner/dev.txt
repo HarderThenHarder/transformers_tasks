@@ -1,0 +1,20 @@
+{"content": "7月10日从检验中心返回酒店发票是什3+二一共十五元", "result_list": [{"text": "7月10日", "start": 0, "end": 5}], "prompt": "时间"}
+{"content": "7月10日从检验中心返回酒店发票是什3+二一共十五元", "result_list": [{"text": "检验中心", "start": 6, "end": 10}], "prompt": "出发地"}
+{"content": "7月10日从检验中心返回酒店发票是什3+二一共十五元", "result_list": [{"text": "酒店", "start": 12, "end": 14}], "prompt": "目的地"}
+{"content": "7月10日从检验中心返回酒店发票是什3+二一共十五元", "result_list": [{"text": "十五", "start": 23, "end": 25}], "prompt": "费用"}
+{"content": "从百度大厦到龙泽苑东区打车费二十元", "result_list": [{"text": "百度大厦", "start": 1, "end": 5}], "prompt": "出发地"}
+{"content": "从百度大厦到龙泽苑东区打车费二十元", "result_list": [{"text": "龙泽苑东区", "start": 6, "end": 11}], "prompt": "目的地"}
+{"content": "从百度大厦到龙泽苑东区打车费二十元", "result_list": [{"text": "二十", "start": 14, "end": 16}], "prompt": "费用"}
+{"content": "二零一九年十一月十三日晚上十点三十四分加班打车回家，四十三元", "result_list": [{"text": "二零一九年十一月十三日晚上十点三十四分", "start": 0, "end": 19}], "prompt": "时间"}
+{"content": "二零一九年十一月十三日晚上十点三十四分加班打车回家，四十三元", "result_list": [{"text": "家", "start": 24, "end": 25}], "prompt": "目的地"}
+{"content": "二零一九年十一月十三日晚上十点三十四分加班打车回家，四十三元", "result_list": [{"text": "四十三", "start": 26, "end": 29}], "prompt": "费用"}
+{"content": "2月4号南山到龙岗龙岗到南山二十元", "result_list": [{"text": "2月4号", "start": 0, "end": 4}], "prompt": "时间"}
+{"content": "2月4号南山到龙岗龙岗到南山二十元", "result_list": [{"text": "南山", "start": 4, "end": 6}], "prompt": "出发地"}
+{"content": "2月4号南山到龙岗龙岗到南山二十元", "result_list": [{"text": "龙岗", "start": 7, "end": 9}], "prompt": "目的地"}
+{"content": "2月4号南山到龙岗龙岗到南山二十元", "result_list": [{"text": "二十", "start": 14, "end": 16}], "prompt": "费用"}
+{"content": "从合肥到北京高铁两百元", "result_list": [{"text": "合肥", "start": 1, "end": 3}], "prompt": "出发地"}
+{"content": "从合肥到北京高铁两百元", "result_list": [{"text": "北京", "start": 4, "end": 6}], "prompt": "目的地"}
+{"content": "从合肥到北京高铁两百元", "result_list": [{"text": "两百", "start": 8, "end": 10}], "prompt": "费用"}
+{"content": "从百度大厦到龙泽苑东区打车费二十元", "result_list": [], "prompt": "时间"}
+{"content": "二零一九年十一月十三日晚上十点三十四分加班打车回家，四十三元", "result_list": [], "prompt": "出发地"}
+{"content": "从合肥到北京高铁两百元", "result_list": [], "prompt": "时间"}
