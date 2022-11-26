@@ -48,7 +48,7 @@ python p_tuning.py \
 ```
 正确开启训练后，终端会打印以下信息：
 
-```sh
+```python
 ...
 global step 5, epoch: 1, loss: 6.50529, speed: 4.25 step/s
 global step 10, epoch: 2, loss: 4.77712, speed: 6.36 step/s

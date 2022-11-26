@@ -48,8 +48,8 @@ class ClassEvaluator(object):
             f"@params pred_spans_batch(len: {len(pred_batch)}) does not match @param gold_spans_batch(len: {len(gold_batch)})"
 
         if type(gold_batch[0]) in [list, tuple]:                                    # 若遇到多个子标签构成一个标签的情况
-            pred_batch = [''.join([str(e) for e in ele]) for ele in pred_batch]     # 将所有的label拼接为一个整label: ['体', '育'] -> '体育'
-            gold_batch = [''.join([str(e) for e in ele]) for ele in gold_batch]
+            pred_batch = [','.join([str(e) for e in ele]) for ele in pred_batch]     # 将所有的label拼接为一个整label: ['体', '育'] -> '体育'
+            gold_batch = [','.join([str(e) for e in ele]) for ele in gold_batch]
         self.goldens.extend(gold_batch)
         self.predictions.extend(pred_batch)
 
@@ -82,16 +82,23 @@ class ClassEvaluator(object):
         res['recall'] = round(recall_score(self.goldens, self.predictions, average='weighted'), round_num)
         res['f1'] = round(f1_score(self.goldens, self.predictions, average='weighted'), round_num)
 
-        conf_matrix = np.array(confusion_matrix(self.goldens, self.predictions))                # (n_class, n_class)
-        for i in range(conf_matrix.shape[0]):                                                   # 构建每个class的指标
-            precision = conf_matrix[i, i] / sum(conf_matrix[:, i])
-            recall = conf_matrix[i, i] / sum(conf_matrix[i, :])
-            class_metrics[classes[i]] = {
-                'precision': round(precision, round_num),
-                'recall': round(recall, round_num),
-                'f1': round(2 * precision * recall / (precision + recall), round_num)
-            }
-        res['class_metrics'] = class_metrics
+        try:
+            print(classes)
+            conf_matrix = np.array(confusion_matrix(self.goldens, self.predictions))                # (n_class, n_class)
+            assert conf_matrix.shape[0] == len(classes), f"confusion_matrix shape ({conf_matrix.shape[0]}) doesn't match labels number ({len(classes)})!"
+            for i in range(conf_matrix.shape[0]):                                                   # 构建每个class的指标
+                precision = conf_matrix[i, i] / sum(conf_matrix[:, i])
+                recall = conf_matrix[i, i] / sum(conf_matrix[i, :])
+                class_metrics[classes[i]] = {
+                    'precision': round(precision, round_num),
+                    'recall': round(recall, round_num),
+                    'f1': round(2 * precision * recall / (precision + recall), round_num)
+                }
+            res['class_metrics'] = class_metrics
+        except Exception as e:
+            print(f'[Warning] Something wrong when calculate class_metrics: {e}')
+            res['class_metrics'] = {}
+        
         return res
 
     def reset(self):
@@ -106,12 +113,12 @@ if __name__ == '__main__':
     from rich import print
 
     metric = ClassEvaluator()
-    # metric.add_batch(
-    #     [['财', '经'], ['财', '经'], ['体', '育'], ['体', '育'], ['计', '算', '机']],
-    #     [['体', '育'], ['财', '经'], ['体', '育'], ['计', '算', '机'], ['计', '算', '机']],
-    # )
     metric.add_batch(
-        [0, 0, 1, 1, 0],
-        [1, 1, 1, 0, 0]
+        [['财', '经'], ['财', '经'], ['体', '育'], ['体', '育'], ['计', '算', '机']],
+        [['体', '育'], ['财', '经'], ['体', '育'], ['计', '算', '机'], ['计', '算', '机']],
     )
+    # metric.add_batch(
+    #     [0, 0, 1, 1, 0],
+    #     [1, 1, 1, 0, 0]
+    # )
     print(metric.compute())
