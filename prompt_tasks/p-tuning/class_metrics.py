@@ -83,7 +83,6 @@ class ClassEvaluator(object):
         res['f1'] = round(f1_score(self.goldens, self.predictions, average='weighted'), round_num)
 
         try:
-            print(classes)
             conf_matrix = np.array(confusion_matrix(self.goldens, self.predictions))                # (n_class, n_class)
             assert conf_matrix.shape[0] == len(classes), f"confusion_matrix shape ({conf_matrix.shape[0]}) doesn't match labels number ({len(classes)})!"
             for i in range(conf_matrix.shape[0]):                                                   # 构建每个class的指标
