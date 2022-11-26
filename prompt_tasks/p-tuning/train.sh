@@ -5,10 +5,11 @@ python p_tuning.py \
     --save_dir "checkpoints/comment_classify/" \
     --img_log_dir "logs/comment_classify" \
     --img_log_name "BERT" \
-    --batch_size 16 \
+    --batch_size 8 \
     --max_seq_len 128 \
     --valid_steps 20  \
     --logging_steps 5 \
-    --num_train_epochs 50 \
+    --num_train_epochs 20 \
     --max_label_len 2 \
+    --p_embedding_num 15 \
     --device "cuda:0"
