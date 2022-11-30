@@ -23,7 +23,6 @@ Date: 2022/11/20
 from typing import List
 
 import numpy as np
-import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score, confusion_matrix
 
 
@@ -86,16 +85,19 @@ class ClassEvaluator(object):
             conf_matrix = np.array(confusion_matrix(self.goldens, self.predictions))                # (n_class, n_class)
             assert conf_matrix.shape[0] == len(classes), f"confusion_matrix shape ({conf_matrix.shape[0]}) doesn't match labels number ({len(classes)})!"
             for i in range(conf_matrix.shape[0]):                                                   # 构建每个class的指标
-                precision = conf_matrix[i, i] / sum(conf_matrix[:, i])
-                recall = conf_matrix[i, i] / sum(conf_matrix[i, :])
+                precision = 0 if sum(conf_matrix[:, i]) == 0 else conf_matrix[i, i] / sum(conf_matrix[:, i])
+                recall = 0 if sum(conf_matrix[i, :]) == 0 else conf_matrix[i, i] / sum(conf_matrix[i, :])
+                f1 = 0 if (precision + recall) == 0 else 2 * precision * recall / (precision + recall)
                 class_metrics[classes[i]] = {
                     'precision': round(precision, round_num),
                     'recall': round(recall, round_num),
-                    'f1': round(2 * precision * recall / (precision + recall), round_num)
+                    'f1': round(f1, round_num)
                 }
             res['class_metrics'] = class_metrics
         except Exception as e:
             print(f'[Warning] Something wrong when calculate class_metrics: {e}')
+            print(f'goldens: {set(self.goldens)}')
+            print(f'predictions: {set(self.predictions)}')
             res['class_metrics'] = {}
         
         return res
@@ -112,12 +114,12 @@ if __name__ == '__main__':
     from rich import print
 
     metric = ClassEvaluator()
-    # metric.add_batch(
-    #     [['财', '经'], ['财', '经'], ['体', '育'], ['体', '育'], ['计', '算', '机']],
-    #     [['体', '育'], ['财', '经'], ['体', '育'], ['计', '算', '机'], ['计', '算', '机']],
-    # )
     metric.add_batch(
-        [0, 0, 1, 1, 0],
-        [1, 1, 1, 0, 0]
+        [['财', '经'], ['财', '经'], ['体', '育'], ['体', '育'], ['计', '算', '机']],
+        [['体', '育'], ['财', '经'], ['体', '育'], ['计', '算', '机'], ['计', '算', '机']],
     )
+    # metric.add_batch(
+    #     [0, 0, 1, 1, 0],
+    #     [1, 1, 1, 0, 0]
+    # )
     print(metric.compute())
