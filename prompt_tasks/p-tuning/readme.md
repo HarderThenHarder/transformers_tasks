@@ -12,20 +12,65 @@ pip install -r ../../requirements.txt
 ```
 
 ### 2. 数据集准备
+
+#### 2.1 标签数据准备
+
 项目中提供了一部分示例数据，根据用户评论预测用户评论的物品类别（分类任务），数据在 `data/comment_classify` 。
 
 若想使用`自定义数据`训练，只需要仿照示例数据构建数据集即可：
 
 ```
-...
 水果	什么苹果啊，都没有苹果味，怪怪的味道，而且一点都不甜，超级难吃！
+书籍	为什么不认真的检查一下， 发这么一本脏脏的书给顾客呢！
+酒店	性价比高的酒店，距离地铁近，邻华师大，环境好。
 ...
 ```
 
 每一行用 `\t` 分隔符分开，前半部分为`标签（label）`，后半部分为`原始输入`。
 
-> Note: 数据中所有的标签尽量不要出现「不同长度」的情况：例如 -> '计算机'、'水果'...，如果遇到标签长度不等情况时，记得在训练参数中添加上标签最大长度，模型会自动将label padding为参数中设置的最大长度。
+#### 2.2 Verbalizer准备
 
+Verbalizer用于定义「真实标签」到「标签预测词」之间的映射。
+
+在有些情况下，将「真实标签」作为 [MASK] 去预测可能不具备很好的语义通顺性，因此，我们会对「真实标签」做一定的映射。
+
+例如：
+
+```python
+"日本爆冷2-1战胜德国"是一则[MASK][MASK]新闻。	体育
+```
+
+这句话中的标签为「体育」，但如果我们将标签设置为「足球」会更容易预测。
+
+因此，我们可以对「体育」这个 label 构建许多个子标签，在推理时，只要预测到子标签最终推理出真实标签即可，如下：
+
+```python
+体育 -> 足球,篮球,网球,棒球,乒乓,体育
+...
+```
+项目中提供了一部分示例数据在 `data/comment_classify/verbalizer.txt` 。
+
+若想使用`自定义数据`训练，只需要仿照示例数据构建数据集即可：
+
+```python
+电脑	电脑
+水果	水果
+平板	平板
+衣服	衣服
+酒店	酒店
+洗浴	洗浴
+书籍	书籍
+蒙牛	蒙牛
+手机	手机
+```
+
+在例子中我们使用 1 对 1 的verbalizer，若想定义一对多的映射，只需要在后面用 `','` 分隔即可, e.g.:
+
+```python
+...
+水果	苹果,香蕉,橘子
+...
+```
 
 ### 3. 模型训练
 修改训练脚本 `train.sh` 里的对应参数, 开启模型训练：
@@ -35,6 +80,7 @@ python p_tuning.py \
     --model "bert-base-chinese" \               # backbone
     --train_path "data/comment_classify/train.txt" \
     --dev_path "data/comment_classify/dev.txt" \
+    --verbalizer "data/comment_classify/verbalizer.txt" \ # verbalizer存放地址
     --save_dir "checkpoints/comment_classify/" \
     --img_log_dir "logs/comment_classify" \     # loss曲线图存放地址
     --img_log_name "BERT" \                     # loss曲线图文件名
@@ -43,7 +89,8 @@ python p_tuning.py \
     --valid_steps 20  \
     --logging_steps 5 \
     --num_train_epochs 50 \
-    --max_label_len 6 \                         # 标签最大长度
+    --max_label_len 2 \                         # 标签最大长度
+    --p_embedding_num 15 \                      # p_token长度
     --device "cuda:0"                           # 指定使用哪块gpu
 ```
 正确开启训练后，终端会打印以下信息：
@@ -78,7 +125,10 @@ global step 50, epoch: 12, loss: 1.11103, speed: 6.16 step/s
 
 ```python
 ...
-contents = ["苹果卖相很好，而且很甜，很喜欢这个苹果，下次还会支持的", "这破笔记本速度太慢了，卡的不要不要的"]   # 自定义评论
+contents = [
+    "苹果卖相很好，而且很甜，很喜欢这个苹果，下次还会支持的", 
+    "这破笔记本速度太慢了，卡的不要不要的"
+]   # 自定义评论
 res = inference(contents)       # 推测评论类型
 ...
 ```
