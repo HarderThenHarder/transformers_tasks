@@ -73,16 +73,18 @@ def convert_example(
         'mask_labels': []
         }
 
-    for example in examples['text']:
+    for i, example in enumerate(examples['text']):
         try:
             if train_mode:
                 label, content = example.strip().split('\t')
             else:
                 content = example.strip()
             
-            content = content[:max_seq_len-10]      # 防止当[MASK]在尾部的时候被截掉
+            s, origin_p, o = content.split('，')
             inputs_dict={
-                'textA': content,                   # 传入对应prompt的自定义参数
+                'Subject': s,                   # 传入对应prompt的自定义参数
+                'OriginP': origin_p,
+                'Object': o,
                 'MASK': '[MASK]'
             }
             encoded_inputs = template(
@@ -92,15 +94,18 @@ def convert_example(
                 mask_length=max_label_len
             )
         except:
-            print(f'"{example}" -> {traceback.format_exc()}')
+            print(f'Error Line {i+1}: "{example}" -> {traceback.format_exc()}')
             exit()
         tokenized_output['input_ids'].append(encoded_inputs["input_ids"])
         tokenized_output['token_type_ids'].append(encoded_inputs["token_type_ids"])
         tokenized_output['attention_mask'].append(encoded_inputs["attention_mask"])
         tokenized_output['mask_positions'].append(encoded_inputs["mask_position"])
         if train_mode:
-            label_encoded = tokenizer(text=[label])
-            tokenized_output['mask_labels'].append(label_encoded['input_ids'][0][1:-1])
+            label_encoded = tokenizer(text=[label])                                     # 将label补到最大长度
+            label_encoded = label_encoded['input_ids'][0][1:-1]
+            label_encoded = label_encoded[:max_label_len]
+            label_encoded = label_encoded + [tokenizer.pad_token_id] * (max_label_len - len(label_encoded))
+            tokenized_output['mask_labels'].append(label_encoded)
     
     for k, v in tokenized_output.items():
         if return_tensor:

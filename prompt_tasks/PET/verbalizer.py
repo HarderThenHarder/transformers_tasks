@@ -82,6 +82,8 @@ class Verbalizer(object):
             }
         """
         if type(label) == list:                                                 # 如果传入为id_list, 则通过tokenizer转回来
+            while self.tokenizer.pad_token_id in label:
+                label.remove(self.tokenizer.pad_token_id)
             label = ''.join(self.tokenizer.convert_ids_to_tokens(label))
         
         if label not in self.label_dict:

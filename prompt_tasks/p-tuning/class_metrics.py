@@ -23,6 +23,7 @@ Date: 2022/11/20
 from typing import List
 
 import numpy as np
+import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score, confusion_matrix
 
 
@@ -75,7 +76,7 @@ class ClassEvaluator(object):
                 }
             }
         """
-        classes, class_metrics, res = sorted(list(set(self.goldens))), {}, {}
+        classes, class_metrics, res = sorted(list(set(self.goldens) | set(self.predictions))), {}, {}
         res['accuracy'] = round(accuracy_score(self.goldens, self.predictions), round_num)      # 构建全局指标
         res['precision'] = round(precision_score(self.goldens, self.predictions, average='weighted'), round_num)
         res['recall'] = round(recall_score(self.goldens, self.predictions, average='weighted'), round_num)
@@ -96,8 +97,9 @@ class ClassEvaluator(object):
             res['class_metrics'] = class_metrics
         except Exception as e:
             print(f'[Warning] Something wrong when calculate class_metrics: {e}')
-            print(f'goldens: {set(self.goldens)}')
-            print(f'predictions: {set(self.predictions)}')
+            print(f'-> goldens: {set(self.goldens)}')
+            print(f'-> predictions: {set(self.predictions)}')
+            print(f'-> diff elements: {set(self.predictions) - set(self.goldens)}')
             res['class_metrics'] = {}
         
         return res

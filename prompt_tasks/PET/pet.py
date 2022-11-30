@@ -86,6 +86,9 @@ def evaluate_model(model, metric, data_loader, global_step, tokenizer, verbalize
                             token_type_ids=batch['token_type_ids'].to(args.device),
                             attention_mask=batch['attention_mask'].to(args.device)).logits
             mask_labels = batch['mask_labels'].numpy().tolist()                                          # (batch, label_num)
+            for i in range(len(mask_labels)):                                                            # 去掉label中的[PAD] token
+                while tokenizer.pad_token_id in mask_labels[i]:
+                    mask_labels[i].remove(tokenizer.pad_token_id)
             mask_labels = [''.join(tokenizer.convert_ids_to_tokens(t)) for t in mask_labels]             # id转文字
             predictions = convert_logits_to_ids(logits, batch['mask_positions']).cpu().numpy().tolist()  # (batch, label_num)
             predictions = verbalizer.batch_find_main_label(predictions)                                  # 找到子label属于的主label
