@@ -58,11 +58,11 @@ def convert_example(
 
     Returns:
         dict (str: np.array) -> tokenized_output = {
-                            'input_ids': [[1, 47, 10, 7, 304, 3, 480, 279, 74, 47, 27, 247, 98, 105, 512, 777, 15, 12043, 2], ...],
+                            'input_ids': [[1, 47, 10, 7, 304, 3, 3, 3, 3, 47, 27, 247, 98, 105, 512, 777, 15, 12043, 2], ...],
                             'token_type_ids': [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ...],
                             'attention_mask': [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], ...],
-                            'mask_positions': [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ...],
-                            'mask_labels': ['手机', '体育', ...]
+                            'mask_positions': [[5, 6, 7, 8], ...],
+                            'mask_labels': [[2372, 3442, 0, 0], [2643, 4434, 2334, 0], ...]
                         }
     """
     tokenized_output = {
@@ -79,12 +79,9 @@ def convert_example(
                 label, content = example.strip().split('\t')
             else:
                 content = example.strip()
-            
-            s, origin_p, o = content.split('，')
+
             inputs_dict={
-                'Subject': s,                   # 传入对应prompt的自定义参数
-                'OriginP': origin_p,
-                'Object': o,
+                'textA': content,
                 'MASK': '[MASK]'
             }
             encoded_inputs = template(
@@ -100,6 +97,7 @@ def convert_example(
         tokenized_output['token_type_ids'].append(encoded_inputs["token_type_ids"])
         tokenized_output['attention_mask'].append(encoded_inputs["attention_mask"])
         tokenized_output['mask_positions'].append(encoded_inputs["mask_position"])
+        
         if train_mode:
             label_encoded = tokenizer(text=[label])                                     # 将label补到最大长度
             label_encoded = label_encoded['input_ids'][0][1:-1]
@@ -150,6 +148,8 @@ def mlm_loss(
         single_mask_logits = single_mask_logits.reshape(-1, vocab_size)                     # (sub_label_num * mask_label_num, vocab_size)
         single_sub_mask_labels = torch.LongTensor(single_sub_mask_labels).to(device)        # (sub_label_num, mask_label_num)
         single_sub_mask_labels = single_sub_mask_labels.reshape(-1, 1).squeeze()            # (sub_label_num * mask_label_num)
+        if not single_sub_mask_labels.size():                                               # 处理单token维度下维度缺失的问题
+            single_sub_mask_labels = single_sub_mask_labels.unsqueeze(dim=0)
         cur_loss = cross_entropy_criterion(single_mask_logits, single_sub_mask_labels)
         cur_loss = cur_loss / len(single_sub_mask_labels)
         if not loss:
