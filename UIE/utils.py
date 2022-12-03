@@ -11,12 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
 import re
+import sys
 import math
 import json
 import random
 from tqdm import tqdm
 
+import torch
+import requests
 import numpy as np
 
 
@@ -521,3 +525,88 @@ def convert_example(example, tokenizer, max_seq_len, multilingual=False):
             "end_positions": end_ids
         }
     return tokenized_output
+
+
+def http_get(
+    url,
+    temp_file,
+    proxies=None,
+    resume_size=0,
+    user_agent=None,
+    ):
+    """
+    Download file from url with requests.
+
+    Args:
+        url (_type_): _description_
+        temp_file (_type_): _description_
+        proxies (_type_, optional): _description_. Defaults to None.
+        resume_size (int, optional): _description_. Defaults to 0.
+        user_agent (_type_, optional): _description_. Defaults to None.
+    """
+    ua = "python/{}".format(sys.version.split()[0])
+    ua += "; torch/{}".format(torch.__version__)
+    if isinstance(user_agent, dict):
+        ua += "; " + "; ".join("{}/{}".format(k, v) for k, v in user_agent.items())
+    elif isinstance(user_agent, str):
+        ua += "; " + user_agent
+    headers = {"user-agent": ua}
+
+    if resume_size > 0:
+        headers["Range"] = "bytes=%d-" % (resume_size,)
+    response = requests.get(url, stream=True, proxies=proxies, headers=headers)
+    
+    if response.status_code == 416:  # Range not satisfiable
+        return
+    
+    content_length = response.headers.get("Content-Length")
+    total = resume_size + int(content_length) if content_length is not None else None
+    progress = tqdm(
+        unit="B",
+        unit_scale=True,
+        total=total,
+        initial=resume_size,
+        desc="Downloading",
+    )
+    for chunk in response.iter_content(chunk_size=1024):
+        if chunk:  # filter out keep-alive new chunks
+            progress.update(len(chunk))
+            temp_file.write(chunk)
+    progress.close()
+
+
+def download_pretrained_model(save_path: str, proxies=None):
+    """
+    Downloads a given url in a temporary file. This function is not safe to use in multiple processes. Its only use is
+    for deprecated behavior allowing to download config/models with a single url instead of using the Hub.
+    
+    Args:
+        save_path (`str`):  file download saved path.
+        proxies (`Dict[str, str]`, *optional*):
+            A dictionary of proxy servers to use by protocol or endpoint, e.g., `{'http': 'foo.bar:3128',
+            'http://hostname': 'foo.bar:4012'}.` The proxies are used on each request.
+    
+    Returns:
+        `str`: The location of the temporary file where the url was downloaded.
+    """
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
+    base_download_url = 'https://huggingface.co/Pky/uie-base-zh/resolve/main'
+    files = [
+        'pytorch_model.bin', 
+        'tokenizer.json', 
+        'tokenizer_config.json',
+        'vocab.txt',
+        'special_tokens_map.json'
+    ]
+
+    for tmp_file in files:
+        url = os.path.join(base_download_url, tmp_file)
+        file = os.path.join(save_path, tmp_file)
+        with open(file, "wb") as f:
+            http_get(url, f, proxies=proxies)
+
+
+if __name__ == '__main__':
+    download_pretrained_model('uie-base-zh')

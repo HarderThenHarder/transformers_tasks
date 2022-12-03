@@ -32,18 +32,19 @@ from transformers import AutoTokenizer, AutoModel, default_data_collator, get_sc
 
 from metrics import SpanEvaluator
 from model import UIE, convert_example
+from utils import download_pretrained_model
 from iTrainingLogger import iSummaryWriter
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model", default=None, type=str, required=True, help="backbone of encoder.")
+parser.add_argument("--pretrained_model", default='uie-base-zh', type=str, required=True, choices=['uie-base-zh'], help="backbone of encoder.")
 parser.add_argument("--train_path", default=None, type=str, help="The path of train set.")
 parser.add_argument("--dev_path", default=None, type=str, help="The path of dev set.")
 parser.add_argument("--save_dir", default="./checkpoint", type=str, required=False, help="The output directory where the model predictions and checkpoints will be written.")
 parser.add_argument("--max_seq_len", default=300, type=int,help="The maximum total input sequence length after tokenization. Sequences longer "
     "than this will be truncated, sequences shorter will be padded.", )
 parser.add_argument("--batch_size", default=32, type=int, help="Batch size per GPU/CPU for training.", )
-parser.add_argument("--learning_rate", default=5e-5, type=float, help="The initial learning rate for Adam.")
+parser.add_argument("--learning_rate", default=1e-4, type=float, help="The initial learning rate for Adam.")
 parser.add_argument("--weight_decay", default=0.0, type=float, help="Weight decay if we apply some.")
 parser.add_argument("--num_train_epochs", default=10, type=int, help="Total number of training epochs to perform.")
 parser.add_argument("--warmup_ratio", default=0.06, type=float, help="Linear warmup over warmup_ratio * total_steps.")
@@ -94,9 +95,11 @@ def evaluate(model, metric, data_loader, global_step):
 
 
 def train():
-    model = AutoModel.from_pretrained(args.model)
-    model = UIE(model)
-    tokenizer = AutoTokenizer.from_pretrained(args.model)
+    if not os.path.exists(args.pretrained_model):
+        download_pretrained_model(args.pretrained_model)
+    model = torch.load(os.path.join(args.pretrained_model, 'pytorch_model.bin'),
+                        map_location=torch.device('cpu'))        # 加载预训练好的UIE模型，模型结构见：model.UIE()
+    tokenizer = AutoTokenizer.from_pretrained(args.pretrained_model)                    # 加载tokenizer，ERNIE 3.0
     dataset = load_dataset('text', data_files={'train': args.train_path,
                                                 'dev': args.dev_path})    
     print(dataset)
@@ -119,7 +122,7 @@ def train():
             "weight_decay": 0.0,
         },
     ]
-    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=5e-5)
+    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
     model.to(args.device)
 
     # 根据训练轮数计算最大训练步数，以便于scheduler动态调整lr
@@ -188,4 +191,5 @@ def train():
 
 
 if __name__ == '__main__':
+    from rich import print
     train()
