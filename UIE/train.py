@@ -97,8 +97,7 @@ def evaluate(model, metric, data_loader, global_step):
 def train():
     if not os.path.exists(args.pretrained_model):
         download_pretrained_model(args.pretrained_model)
-    model = torch.load(os.path.join(args.pretrained_model, 'pytorch_model.bin'),
-                        map_location=torch.device('cpu'))        # 加载预训练好的UIE模型，模型结构见：model.UIE()
+    model = torch.load(os.path.join(args.pretrained_model, 'pytorch_model.bin'))        # 加载预训练好的UIE模型，模型结构见：model.UIE()
     tokenizer = AutoTokenizer.from_pretrained(args.pretrained_model)                    # 加载tokenizer，ERNIE 3.0
     dataset = load_dataset('text', data_files={'train': args.train_path,
                                                 'dev': args.dev_path})    
