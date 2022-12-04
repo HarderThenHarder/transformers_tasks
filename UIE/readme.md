@@ -36,7 +36,7 @@ pip install -r ../requirements.txt
 
 ```sh
 python train.py \
-    --model "nghuyong/ernie-3.0-base-zh" \
+    --pretrained_model "uie-base-zh" \
     --save_dir "checkpoints/simple_ner" \
     --train_path "data/simple_ner/train.txt" \
     --dev_path "data/simple_ner/dev.txt" \
