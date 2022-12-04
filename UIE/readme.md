@@ -2,7 +2,7 @@
 
 UIE的官方文档在[这里](https://github.com/PaddlePaddle/PaddleNLP/tree/develop/model_zoo/uie)。
 
-有关UIE的详细的详细介绍在[这里]()。
+有关UIE的详细的详细介绍在[这里](https://zhuanlan.zhihu.com/p/589054073)。
 
 该项目将借用transformers库来实现paddlenlp版本中UIE。
 
