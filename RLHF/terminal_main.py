@@ -15,10 +15,9 @@
 │      └───┴─────┴───────────────────────┴─────┴───┘          │
 └─────────────────────────────────────────────────────────────┘
 
-Copyright (c) 2022 ByteDance.com, Inc. All Rights Reserved
 Reinforcemnet Learning from Human Feedback 终端版。
 
-Author: pankeyu(pankeyu@bytedance.com)
+Author: pankeyu
 Date: 2022/12/27
 """
 import random
