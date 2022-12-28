@@ -10,6 +10,7 @@
 
 * 基于人工打分的评论生成机器人（With Human Reward）
 
+<br>
 
 ### 1. 基于中文情感识别模型的正向评论生成机器人（No Human Reward）
 
@@ -37,9 +38,13 @@ output 3: 刚收到货，感觉有 些 惊 喜 于 货 物 质 量              
 ...
 ```
 
-如果依靠人工为每一个输出打分，这将是一个非常漫长的过程（在另一个示例中我们将实现该功能），因此，我们引入另一个「情绪识别模型」来模拟人工给出的分数。
+如果依靠人工为每一个输出打分，这将是一个非常漫长的过程（在另一个示例中我们将实现该功能）。
 
-「情绪识别模型」我们选用 transformers 中内置的 sentiment-analysis pipeline 来实现，[该模型](https://huggingface.co/uer/roberta-base-finetuned-jd-binary-chinese)基于网络评论数据集训练，能够对句子进行「正向、负向」的情绪判别，如下所示：
+因此，我们引入另一个「情绪识别模型」来模拟人工给出的分数。
+
+「情绪识别模型」我们选用 transformers 中内置的 sentiment-analysis pipeline 来实现。
+
+[该模型](https://huggingface.co/uer/roberta-base-finetuned-jd-binary-chinese)基于网络评论数据集训练，能够对句子进行「正向、负向」的情绪判别，如下所示：
 
 <img src='assets/sentiment-analysis.png'>
 
@@ -109,6 +114,7 @@ Random Sample 5 text(s) of model output:
 
 <img src='assets/end.jpg'>
 
+<br>
 
 ### 2. 基于人工打分的评论生成机器人（With Human Reward）
 
