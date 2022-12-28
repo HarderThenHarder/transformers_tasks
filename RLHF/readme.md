@@ -116,7 +116,7 @@ Random Sample 5 text(s) of model output:
 
 在该示例中，我们将制作一个平台来支持人工进行打分。
 
-然后，我们启动标注平台：
+我们启动标注平台：
 
 ```sh
 python terminal_main.py 

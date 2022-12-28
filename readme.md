@@ -38,3 +38,10 @@
 | 模型  | 传送门  |
 |---|---|
 | BERT-CLS  | [[这里]](./text_classification/train.sh) |
+
+
+#### 5. 强化学习 & 语言模型（Reinforcement Learning & Language Model）
+
+| 模型  | 传送门  |
+|---|---|
+| PPO-GPT2  | [[这里]](./RLHF/readme.md) |
