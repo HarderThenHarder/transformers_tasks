@@ -4,6 +4,8 @@
 
 有关 ChatGPT 的视频讲解可以参考[这里](https://www.bilibili.com/video/BV1BG4y137SH/?vd_source=0df98e40ba56afac31703b0d5dba509f#reply143954452208)。
 
+该项目的详细介绍可以参考[这里](https://zhuanlan.zhihu.com/p/595116794)。
+
 在这个项目中，我们将通过开源项目 [trl](https://github.com/lvwerra/trl) 搭建一个通过强化学习算法（PPO）来更新语言模型（GPT-2）的几个示例，包括：
 
 * 基于中文情感识别模型的正向评论生成机器人（No Human Reward）
