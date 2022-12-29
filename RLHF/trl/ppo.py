@@ -139,11 +139,11 @@ class PPOTrainer:
         response_lengths = [len(r) for r in responses]
 
         t = time.time()
-        logprobs, ref_logprobs, values = self.batched_forward_pass(queries, responses)
+        logprobs, ref_logprobs, values = self.batched_forward_pass(queries, responses)          # 拿到模型生成的tokens的log_prob、token_value
         timing['time/ppo/forward_pass'] = time.time()-t
 
         t = time.time()
-        rewards, non_score_reward = self.compute_rewards(scores, logprobs, ref_logprobs)
+        rewards, non_score_reward = self.compute_rewards(scores, logprobs, ref_logprobs)        # 计算discount reward
         timing['time/ppo/compute_rewards'] = time.time()-t
 
         t = time.time()
@@ -195,14 +195,14 @@ class PPOTrainer:
             with torch.no_grad():
                 logits, _, v = self.model(input_ids)                                    # logits -> (batch, max_output_len, vocab_size); v -> (batch, max_ouput_len)
                 ref_logits, _, _ = self.ref_model(input_ids)
-            logprobs = logprobs_from_logits(logits[:,:-1,:], input_ids[:,1:])
-            ref_logprobs = logprobs_from_logits(ref_logits[:,:-1,:], input_ids[:,1:])
+            logprobs = logprobs_from_logits(logits[:,:-1,:], input_ids[:,1:])           # (batch, seq_len - 1)
+            ref_logprobs = logprobs_from_logits(ref_logits[:,:-1,:], input_ids[:,1:])   # (batch, seq_len - 1)
             for j in range(fbs):
-                start = len(query_batch[j])-1
+                start = len(query_batch[j])-1                                           # 拿到模型生成部分的信息（去掉prompt部分的信息）
                 end = len(query_batch[j]) + len(response_batch[j])-1
-                all_values.append(v[j, start-1:end-1])
-                all_logprobs.append(logprobs[j, start:end])
-                all_ref_logprobs.append(ref_logprobs[j, start:end])
+                all_values.append(v[j, start-1:end-1])                                  # 生成的tokens的value
+                all_logprobs.append(logprobs[j, start:end])                             # 生成的tokens的概率
+                all_ref_logprobs.append(ref_logprobs[j, start:end])                     # ref model生成的tokens的概率
         return all_logprobs, all_ref_logprobs, all_values
 
     def train_minibatch(self, logprobs, values, rewards, query, response, model_input):
@@ -239,28 +239,27 @@ class PPOTrainer:
             advantages_reversed.append(lastgaelam)
         advantages = torch.stack(advantages_reversed[::-1]).transpose(0, 1)
 
-        returns = advantages + values
+        returns = advantages + values                                               # (batch, generated_seq_len)
         advantages = whiten(advantages)
         advantages = advantages.detach()
 
-        logits, _, vpred = self.model(model_input)
+        logits, _, vpred = self.model(model_input)                                  # logits -> (batch, all_seq_len, vocab_size); vpred -> (batch, all_seq_len)
         logprob = logprobs_from_logits(logits[:,:-1,:], model_input[:, 1:])
 
         #only the generation part of the values/logprobs is needed
-        logprob, vpred = logprob[:, -gen_len:], vpred[:,-gen_len-1:-1]
+        logprob, vpred = logprob[:, -gen_len:], vpred[:,-gen_len-1:-1]              # logprob -> (batch, generated_seq_len); vpred -> (batch, generated_seq_len)
 
         vpredclipped = clip_by_value(vpred,
                                      values - self.ppo_params["cliprange_value"],
                                      values + self.ppo_params["cliprange_value"])
 
-        vf_losses1 = (vpred - returns)**2
-        vf_losses2 = (vpredclipped - returns)**2
+        vf_losses1 = (vpred - returns)**2                                           # value loss = v - (r + gamma * n_next)
+        vf_losses2 = (vpredclipped - returns)**2                                    # value loss clipped
         vf_loss = .5 * torch.mean(torch.max(vf_losses1, vf_losses2))
         vf_clipfrac =  torch.mean(torch.gt(vf_losses2, vf_losses1).double())
 
         ratio = torch.exp(logprob - old_logprobs)
-
-        pg_losses = -advantages * ratio
+        pg_losses = -advantages * ratio                                             # importance sampling
         pg_losses2 = -advantages * torch.clamp(ratio,
                                                1.0 - self.ppo_params['cliprange'],
                                                1.0 + self.ppo_params['cliprange'])

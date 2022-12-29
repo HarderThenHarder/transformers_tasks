@@ -3,7 +3,6 @@
 __all__ = ['CausalLMOutputWithCrossAttentions', 'ValueHead', 'GPT2HeadWithValueModel', 'respond_to_batch']
 
 # Cell
-
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, GPT2Model, GPT2PreTrainedModel
 from transformers import top_k_top_p_filtering
 from transformers.modeling_outputs import ModelOutput
@@ -26,9 +25,9 @@ class CausalLMOutputWithCrossAttentions(ModelOutput):
     value: Optional[torch.FloatTensor] = None
 
 # Cell
-
 class ValueHead(nn.Module):
     """The ValueHead class implements a head for GPT2 that returns a scalar for each output token."""
+    
     def __init__(self, config):
         super().__init__()
         self.detach_head = False
@@ -70,8 +69,8 @@ class ValueHead(nn.Module):
 
         return output
 
-# Cell
 
+# Cell
 class GPT2HeadWithValueModel(GPT2PreTrainedModel):
     """The GPT2HeadWithValueModel class implements a GPT2 language model with a secondary, scalar head."""
     def __init__(self, config):
@@ -80,7 +79,6 @@ class GPT2HeadWithValueModel(GPT2PreTrainedModel):
         self.transformer = GPT2Model(config)
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
         self.v_head = ValueHead(config)
-
         self.init_weights()
 
     def get_output_embeddings(self):
@@ -117,13 +115,10 @@ class GPT2HeadWithValueModel(GPT2PreTrainedModel):
             inputs_embeds=inputs_embeds,
             use_cache=use_cache,
         )
-
-        hidden_states = transformer_outputs[0]
-
-        lm_logits = self.lm_head(hidden_states)
-        value = self.v_head(hidden_states).squeeze(-1)
-
-
+        hidden_states = transformer_outputs[0]              # (batch, seq_len, 768)
+        lm_logits = self.lm_head(hidden_states)             # (batch, seq_len, vocab_size)
+        value = self.v_head(hidden_states).squeeze(-1)      # (batch, seq_len)
+        
         if not return_dict:
             outputs = (lm_logits, loss, value,)
             return outputs
@@ -167,7 +162,6 @@ class GPT2HeadWithValueModel(GPT2PreTrainedModel):
         }
 
 # Cell
-
 def respond_to_batch(model, queries, txt_len=20, top_k=0, top_p=1.0):
     """Sample text from language model."""
     input_ids = queries
