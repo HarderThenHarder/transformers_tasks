@@ -218,13 +218,13 @@ class PPOTrainer:
         """Compute per token rewards from scores and KL-penalty."""
         rewards, non_score_rewards = [], []
         for score, logprob, ref_logprob in zip(scores, logprobs, ref_logprobs):
-            kl = logprob - ref_logprob                                              # (seq_len, )
-            non_score_reward = -self.kl_ctl.value * kl                              # (seq_len, )
+            kl = logprob - ref_logprob                                                 # (seq_len, )
+            non_score_reward = -self.kl_ctl.value * kl                                 # (seq_len, )
             non_score_rewards.append(non_score_reward)
-            reward = non_score_reward.clone()                                       # 前面每一个token的reward都来自KL惩罚
-            reward[-1] += score                                                     # 在最后一位加上人工给的reward
+            reward = non_score_reward.clone()                                          # 前面每一个token的reward都来自KL惩罚
+            reward[-1] += score                                                        # 在最后一位加上人工给的reward
             rewards.append(reward)
-        return rewards, non_score_rewards                                           # (batch, seq_len)
+        return rewards, non_score_rewards                                              # (batch, seq_len)
 
     def loss(self, old_logprobs, values, rewards, query, response, model_input):
         """Calculate policy and value losses."""
