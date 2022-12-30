@@ -10,4 +10,4 @@ python train.py \
     --num_train_epochs 100 \
     --logging_steps 10 \
     --valid_steps 100 \
-    --device cpu
+    --device "cuda:0"

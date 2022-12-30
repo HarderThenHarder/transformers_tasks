@@ -137,3 +137,59 @@ python terminal_main.py
 <img src='assets/terminal.png'>
 
 
+<br>
+
+### 3. 基于人工排序训练 Reward Model
+
+通过排序序列训练打分模型，详细讲解参考[这里]()。
+
+训练数据集在 `data/reward_datasets/sentiment_analysis`，每一行是一个排序序列（用\t符号隔开）。
+
+排在越前面的越偏「正向情绪」，排在越后面越「负向情绪」。
+
+```python
+1.买过很多箱这个苹果了，一如既往的好，汁多味甜～	2.名不副实。	3.拿过来居然屏幕有划痕，顿时就不开心了	4.什么手机啊！一台充电很慢，信号不好！退了！又买一台竟然是次品。
+1.一直用沙宣的洗发露！是正品！去屑止痒润发护发面面俱到！	2.觉得比外买的稀，好似加了水的	3.非常非常不满意，垃圾。	4.什么垃圾衣服，买来一星期不到口袋全拖线，最差的一次购物
+...
+```
+
+开启训练脚本：
+
+```sh
+sh train_reward_model.sh
+```
+
+成功开始训练后，终端会打印以下信息：
+
+```python
+...
+global step 10, epoch: 1, loss: -0.51766, speed: 0.21 step/s
+global step 20, epoch: 1, loss: -0.55865, speed: 0.22 step/s
+global step 30, epoch: 1, loss: -0.60930, speed: 0.21 step/s
+global step 40, epoch: 1, loss: -0.65024, speed: 0.21 step/s
+global step 50, epoch: 1, loss: -0.67781, speed: 0.22 step/s
+Evaluation acc: 0.50000
+best F1 performence has been updated: 0.00000 --> 0.50000
+global step 60, epoch: 1, loss: -0.69296, speed: 0.20 step/s
+global step 70, epoch: 1, loss: -0.70710, speed: 0.20 step/s
+...
+```
+
+完成训练后，我们运行预测脚本，可以看到训练后的模型的打分效果：
+
+```sh
+python inference_reward_model.py
+```
+
+我们输入两句评论句子：
+
+```python
+texts = [
+    '买过很多箱这个苹果了，一如既往的好，汁多味甜～',
+    '一台充电很慢，信号不好！退了！又买一台竟然是次品。。服了。。'
+]
+
+>>> tensor([[10.6989], [-9.2695]], grad_fn=<AddmmBackward>)
+```
+
+可以看到「正向评论」得到了 10.6 分，而「负向评论」得到了 -9.26 分。
