@@ -141,7 +141,7 @@ python terminal_main.py
 
 ### 3. 基于人工排序训练 Reward Model
 
-通过排序序列训练打分模型，详细讲解参考[这里]()。
+通过排序序列训练打分模型，详细讲解参考[这里](https://zhuanlan.zhihu.com/p/595579042)。
 
 训练数据集在 `data/reward_datasets/sentiment_analysis`，每一行是一个排序序列（用\t符号隔开）。
 
