@@ -175,6 +175,10 @@ global step 70, epoch: 1, loss: -0.70710, speed: 0.20 step/s
 ...
 ```
 
+在 `logs/reward_model/sentiment_analysis/ERNIE Reward Model.png` 会存放训练曲线图：
+
+<img src='assets/ERNIE Reward Model.png'>
+
 完成训练后，我们运行预测脚本，可以看到训练后的模型的打分效果：
 
 ```sh
