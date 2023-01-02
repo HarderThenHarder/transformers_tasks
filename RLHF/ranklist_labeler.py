@@ -18,7 +18,7 @@
 Rank List 标注平台，用于标注 Reward Model 的训练数据，通过streamlit搭建。
 
 Author: pankeyu
-Date: 2022/12/26
+Date: 2022/1/2
 """
 import os
 import random
