@@ -197,3 +197,41 @@ texts = [
 ```
 
 可以看到「正向评论」得到了 10.6 分，而「负向评论」得到了 -9.26 分。
+
+<br>
+
+### 4. 人工排序（RankList）标注平台
+
+对于第三步 Reward Model 训练，若想自定义的排序数据集，可以使用该项目中提供的标注工具：
+
+<img src='assets/rank_list_labler.png'>
+
+平台使用 `streamlit` 搭建，因此使用前需要先安装三方包：
+
+```sh
+pip install streamlit
+```
+
+随后，运行以下命令开启标注平台：
+
+```sh
+sh start_ranklist_labler.sh
+```
+在浏览器中访问 ip + 端口（默认8904, 可在 `sh start_ranklist_labler.sh` 中修改端口号）即可打开标注平台。
+
+点击 `随机 prompt` 按钮可以从 prompt池 中随机选择一个 prompt（prompt池可以在 `ranklist_labeler.py` 中修改 `MODEL_CONFIG['random_prompts']`）。
+
+通过对模型生成的 4 个答案进行排序，得到从高分到低分的排序序列，点击底部的 `存储当前排序` 按钮将当前排序存入本地数据集中。
+
+数据集将存储在 `data/human_labeled/total_dataset.tsv` 中（可在 `ranklist_labeler.py` 中修改 `MODEL_CONFIG['dataset_file']` 参数），每一行是一个 rank_list，用 `\t` 分割：
+
+```python
+今天早晨我去了 一 趟 酒 店 ， 在 check in 的 时 候 我 也 在 ， 但 是 那 位 前 任 不 让 我 进 去 ， 直 接 说 了 一 句	今天早晨我去了 中 介 的 办 公 楼 ， 看 了 我 的 婚 纱 照 ， 拍 的 时 候 已 经 是 晚 上 十 一 点 有 点 累 了 ， 我	今天早晨我去了 天 津 ， 因 为 天 气 真 是 糟 糕 ， 天 都 是 蓝 色 的 ， 但 我 在 一 个 山 坡 上 ， 因 为 时 间 短	今天早晨我去了 你 们 工 作 室 ， 一 片 混 乱 ， 有 什 么 问 题 都 没 有 ， 还 有 一 些 工 作 人 员 乱 来 乱 走 ，
+...
+```
+
+也可以点击标注页面上方的 `Dataset` 按钮，可以查看当前已存储的数据集：
+
+<img src='assets/rank_list_dataset.png'>
+
+数据标注完成后，即可参照第三步训练一个自定义的 `Reward Model`。
