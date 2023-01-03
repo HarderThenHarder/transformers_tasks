@@ -127,7 +127,7 @@ with label_tab:
         if random_button:
             prompt_text = random.choice(MODEL_CONFIG['random_prompts'])
         else:
-            prompt_text = '今天早晨我去了'
+            prompt_text = st.session_state['current_prompt']
         
         query_txt = st.text_input('prompt: ', prompt_text)
         if query_txt != st.session_state['current_prompt']:
