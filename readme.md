@@ -2,8 +2,6 @@
 
 基于 transformers 包实现的多种 NLP 任务。
 
-专栏地址，欢迎关注：https://www.zhihu.com/column/c_1451236880973426688
-
 <br>
 
 已实现的任务模型：
