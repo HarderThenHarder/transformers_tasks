@@ -10,7 +10,11 @@
 
 * 基于中文情感识别模型的正向评论生成机器人（No Human Reward）
 
-* 基于人工打分的评论生成机器人（With Human Reward）
+* 基于人工打分的正向评论生成机器人（With Human Reward）
+
+* 基于排序序列（Rank List）训练一个奖励模型（Reward Model）
+
+* 排序序列（Rank List）标注平台
 
 <br>
 
