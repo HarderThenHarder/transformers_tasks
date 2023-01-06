@@ -75,8 +75,7 @@ sentiment_pipe = pipeline('sentiment-analysis', model=senti_model, tokenizer=sen
 gpt2_model = GPT2HeadWithValueModel.from_pretrained(config['model_name'])
 gpt2_model_ref = GPT2HeadWithValueModel.from_pretrained(config['model_name'])
 gpt2_tokenizer = AutoTokenizer.from_pretrained(config['model_name'])
-gpt2_tokenizer.eos_token = gpt2_tokenizer.sep_token                               # 因为中文用的是Bert的Tokenizer，所以需要
-gpt2_tokenizer.bos_token = gpt2_tokenizer.cls_token                               # 手动指定BOS Token和EOS Token
+gpt2_tokenizer.eos_token = gpt2_tokenizer.pad_token
 gpt2_model.to(device)
 gpt2_model_ref.to(device)
 
