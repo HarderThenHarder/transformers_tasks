@@ -43,3 +43,9 @@
 | 模型  | 传送门  |
 |---|---|
 | PPO-GPT2  | [[这里]](./RLHF/readme.md) |
+
+#### 6. 文本生成（Text Generation）
+
+| 模型  | 传送门  |
+|---|---|
+| 问答模型 | [[这里]](./answer_generation/readme.md) |
