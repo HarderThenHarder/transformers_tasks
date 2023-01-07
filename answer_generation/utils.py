@@ -112,7 +112,7 @@ if __name__ == '__main__':
             },
             tokenizer=tokenizer,
             max_source_seq_len=50,
-            max_target_length=20
+            max_target_seq_len=20
     )
     print(res)
     print('input_ids: ', tokenizer.convert_ids_to_tokens(res['input_ids'][0]))
