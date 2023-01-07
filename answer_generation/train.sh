@@ -6,7 +6,6 @@ python train.py \
     --img_log_dir "logs/DuReaderQG" \
     --img_log_name "T5-Base-Chinese" \
     --batch_size 32 \
-    --learning_rate 1e-4 \
     --max_source_seq_len 256 \
     --max_target_seq_len 32 \
     --learning_rate 5e-5 \
