@@ -60,7 +60,7 @@ args = parser.parse_args()
 writer = iSummaryWriter(log_path=args.img_log_dir, log_name=args.img_log_name)
 
 
-def evaluate_model(model, data_loader, tokenizer):
+def evaluate_model(model, data_loader):
     """
     在测试集上评估当前模型的训练效果。
 
@@ -160,7 +160,7 @@ def train():
                 model.save_pretrained(os.path.join(cur_save_dir))
                 tokenizer.save_pretrained(os.path.join(cur_save_dir))
 
-                bleu1, bleu2, bleu3, bleu4 = evaluate_model(model, eval_dataloader, global_step)
+                bleu1, bleu2, bleu3, bleu4 = evaluate_model(model, eval_dataloader)
                 writer.add_scalar('eval/bleu-size-1', bleu1, global_step)
                 writer.add_scalar('eval/bleu-size-2', bleu2, global_step)
                 writer.add_scalar('eval/bleu-size-3', bleu3, global_step)
