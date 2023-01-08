@@ -33,7 +33,7 @@
 
 | 模型  | 传送门  |
 |---|---|
-| UIE  | [[这里]](./UIE/readme.md) |
+| 通用信息抽取（Universe Information Extraction, UIE）  | [[这里]](./UIE/readme.md) |
 
 <br>
 
@@ -43,8 +43,8 @@
 
 | 模型  | 传送门  |
 |---|---|
-| PET  | [[这里]](./prompt_tasks/PET/readme.md) |
-| p-tuning  | [[这里]](./prompt_tasks/p-tuning/readme.md) |
+| PET（基于人工定义 prompt pattern 的方法）  | [[这里]](./prompt_tasks/PET/readme.md) |
+| p-tuning（机器自动学习 prompt pattern 的方法）  | [[这里]](./prompt_tasks/p-tuning/readme.md) |
 
 <br>
 
@@ -54,17 +54,17 @@
 
 | 模型  | 传送门  |
 |---|---|
-| BERT-CLS  | [[这里]](./text_classification/train.sh) |
+| BERT-CLS（基于 BERT 的分类器）  | [[这里]](./text_classification/train.sh) |
 
 <br>
 
 #### 5. 强化学习 & 语言模型（Reinforcement Learning & Language Model）
 
-> RLHF（Reinforcement Learning from Human Feedback）通过人类的反馈，将强化学习（RL）用于更新语言生成模型（LM），从而达到更好的生成效果（代表例子：ChatGPT）。通常包括：`奖励模型（Reward Model）训练` 和 `强化学习（Reinforcement Learning）训练` 两个阶段。
+> RLHF（Reinforcement Learning from Human Feedback）通过人类的反馈，将强化学习（RL）用于更新语言生成模型（LM），从而达到更好的生成效果（代表例子：ChatGPT）；通常包括：`奖励模型（Reward Model）`训练和 `强化学习（Reinforcement Learning）`训练两个阶段。
 
 | 模型  | 传送门  |
 |---|---|
-| PPO-GPT2  | [[这里]](./RLHF/readme.md) |
+| RLHF（Reward Model 训练，PPO 更新 GPT2）  | [[这里]](./RLHF/readme.md) |
 
 <br>
 
@@ -74,4 +74,4 @@
 
 | 模型  | 传送门  |
 |---|---|
-| 问答模型 | [[这里]](./answer_generation/readme.md) |
+| 中文问答模型（T5-Based） | [[这里]](./answer_generation/readme.md) |
