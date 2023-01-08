@@ -12,8 +12,6 @@
 
 <br>
 
-💡 已实现的任务模型：
-
 #### 1. 文本匹配（Text Matching）
 
 > 计算文本间的相似度，多用于：`搜索召回`、`文本检索`、`蕴含识别` 等任务。
@@ -60,7 +58,7 @@
 
 #### 5. 强化学习 & 语言模型（Reinforcement Learning & Language Model）
 
-> RLHF（Reinforcement Learning from Human Feedback）通过人类的反馈，将强化学习（RL）用于更新语言生成模型（LM），从而达到更好的生成效果（代表例子：ChatGPT）；通常包括：`奖励模型（Reward Model）`训练和 `强化学习（Reinforcement Learning）`训练两个阶段。
+> RLHF（Reinforcement Learning from Human Feedback）通过人类的反馈，将强化学习（RL）用于更新语言生成模型（LM），从而达到更好的生成效果（代表例子：ChatGPT）；通常包括：`奖励模型（Reward Model）` 训练和 `强化学习（Reinforcement Learning）` 训练两个阶段。
 
 | 模型  | 传送门  |
 |---|---|
