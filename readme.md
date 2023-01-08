@@ -1,6 +1,6 @@
 <div align=center> 
 
-<img src="assets/icon.png" width=400>
+<img src="assets/icon.png" width=500>
 
 [![Author](https://img.shields.io/badge/Author-Pankeyu-green.svg "Author")](https://www.zhihu.com/column/c_1451236880973426688) [![OS](https://img.shields.io/badge/OS-Linux/Windows/Mac-red.svg "OS")](./) [![Based](https://img.shields.io/badge/Based-huggingface_transformers-blue.svg "OS")](./)
 
