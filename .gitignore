@@ -5,3 +5,4 @@ __pycache__/
 *.pt
 
 **/checkpoints
+**/.DS_Store
