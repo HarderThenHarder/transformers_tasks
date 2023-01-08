@@ -16,7 +16,7 @@
 
 #### 1. 文本匹配（Text Matching）
 
-计算文本间的相似度，多用于：`搜索召回`、`文本检索`、`蕴含识别` 等任务。
+> 计算文本间的相似度，多用于：`搜索召回`、`文本检索`、`蕴含识别` 等任务。
 
 | 模型  | 传送门  |
 |---|---|
@@ -25,46 +25,52 @@
 | DSSM（双塔）  | [[这里]](./text_matching/train_dssm.sh) |
 | Sentence Bert（双塔）  | [[这里]](./text_matching/train_sentence_transformer.sh) |
 
+<br>
 
 #### 2. 信息抽取（Information Extraction）
 
-在给定的文本段落中抽取目标信息，多用于：`命名实体识别（NER）`，`实体关系抽取（RE）` 等任务。
+> 在给定的文本段落中抽取目标信息，多用于：`命名实体识别（NER）`，`实体关系抽取（RE）` 等任务。
 
 | 模型  | 传送门  |
 |---|---|
 | UIE  | [[这里]](./UIE/readme.md) |
 
+<br>
 
 #### 3. Prompt任务（Prompt Tasks）
-通过设计提示（prompt）模板，实现使用更少量的数据在预训练模型（Pretrained Model）上得到更好的效果，多用于：`Few-Shot`，`Zero-Shot` 等任务。
+
+> 通过设计提示（prompt）模板，实现使用更少量的数据在预训练模型（Pretrained Model）上得到更好的效果，多用于：`Few-Shot`，`Zero-Shot` 等任务。
 
 | 模型  | 传送门  |
 |---|---|
 | PET  | [[这里]](./prompt_tasks/PET/readme.md) |
 | p-tuning  | [[这里]](./prompt_tasks/p-tuning/readme.md) |
 
+<br>
 
 #### 4. 文本分类（Text Classification）
 
-对给定文本进行分类，多用于：`情感识别`，`文章分类识别` 等任务。
+> 对给定文本进行分类，多用于：`情感识别`，`文章分类识别` 等任务。
 
 | 模型  | 传送门  |
 |---|---|
 | BERT-CLS  | [[这里]](./text_classification/train.sh) |
 
+<br>
 
 #### 5. 强化学习 & 语言模型（Reinforcement Learning & Language Model）
 
-RLHF（Reinforcement Learning from Human Feedback）通过人类的反馈，将强化学习（RL）用于更新语言生成模型（LM），从而达到更好的生成效果（代表例子：ChatGPT）。通常包括：`奖励模型（Reward Model）训练` 和 `强化学习（Reinforcement Learning）训练` 两个阶段。
+> RLHF（Reinforcement Learning from Human Feedback）通过人类的反馈，将强化学习（RL）用于更新语言生成模型（LM），从而达到更好的生成效果（代表例子：ChatGPT）。通常包括：`奖励模型（Reward Model）训练` 和 `强化学习（Reinforcement Learning）训练` 两个阶段。
 
 | 模型  | 传送门  |
 |---|---|
 | PPO-GPT2  | [[这里]](./RLHF/readme.md) |
 
+<br>
 
 #### 6. 文本生成（Text Generation）
 
-文本生成（NLG），通常用于：`小说续写`，`智能问答`，`对话机器人` 等任务。
+> 文本生成（NLG），通常用于：`小说续写`，`智能问答`，`对话机器人` 等任务。
 
 | 模型  | 传送门  |
 |---|---|
