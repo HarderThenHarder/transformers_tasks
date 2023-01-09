@@ -10,7 +10,14 @@
 
 ---
 
-基于 transformers 库实现的多种 NLP 任务。
+该项目集成了基于 [transformers](https://huggingface.co/docs/transformers/index) 库实现的多种 NLP 任务。
+
+[huggingface transformers](https://huggingface.co/docs/transformers/index) 是一个非常棒的开源框架，支持非常方便的加载/训练 transformer 模型，你可以在[这里](https://huggingface.co/docs/transformers/quicktour)看到该库的`安装方法`和`入门级调用`，该库也能支持用户非常便捷的[微调一个属于自己的模型](https://huggingface.co/docs/transformers/training)。
+
+在该项目中我们集成了一些主流的NLP任务，你可以找到对应的任务，将代码中的`训练数据集`更换成`你自己任务下的数据集`从而训练一个符合你自己任务下的模型。
+
+目前已经实现的NLP任务如下（不定期更新中）：
+
 
 <br>
 
