@@ -26,6 +26,7 @@ import argparse
 from functools import partial
 
 import torch
+from rich import print
 from torch.utils.data import DataLoader
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, default_data_collator, get_scheduler
