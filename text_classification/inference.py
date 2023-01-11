@@ -47,7 +47,7 @@ def inference(
         List[int]: [laebl1, label2, label3, ...]
     """
     res = []
-    for i in range(1, len(sentences), batch_size):
+    for i in range(0, len(sentences), batch_size):
         batch_sentence = sentences[i:i+batch_size]
         ipnuts = tokenizer(
             batch_sentence,
