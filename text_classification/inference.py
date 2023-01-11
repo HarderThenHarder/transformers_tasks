@@ -48,7 +48,7 @@ def inference(
     """
     res = []
     for i in range(1, len(sentences), batch_size):
-        batch_sentence = sentences[(i - 1) * batch_size:i * batch_size]
+        batch_sentence = sentences[i:i+batch_size]
         ipnuts = tokenizer(
             batch_sentence,
             truncation=True,
