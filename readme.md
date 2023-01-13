@@ -26,10 +26,11 @@
 
 | 模型  | 传送门  |
 |---|---|
-| 概览  | [[这里]](./text_matching/readme.md) |
-| PointWise（单塔）  | [[这里]](./text_matching/train_pointwise.sh) |
-| DSSM（双塔）  | [[这里]](./text_matching/train_dssm.sh) |
-| Sentence Bert（双塔）  | [[这里]](./text_matching/train_sentence_transformer.sh) |
+| 【监督】概览  | [[这里]](./text_matching/supervised/readme.md) |
+| 【监督】PointWise（单塔）  | [[这里]](./text_matching/supervised/train_pointwise.sh) |
+| 【监督】DSSM（双塔）  | [[这里]](./text_matching/supervised/train_dssm.sh) |
+| 【监督】Sentence Bert（双塔）  | [[这里]](./text_matching/supervised/train_sentence_transformer.sh) |
+| 【无监督】SimCSE  | [[这里]](./text_matching/unsupervised/simcse/readme.md) |
 
 <br>
 
