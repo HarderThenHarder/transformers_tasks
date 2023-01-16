@@ -103,7 +103,7 @@ global step 650, epoch: 1, loss: 0.26931, speed: 2.00 step/s
 ...
 ```
 
-在 `logs/comment_classify` 文件下将会保存训练曲线图：
+在 `logs/LCQMC` 文件下将会保存训练曲线图：
 
 <img src='assets/ERNIE-ESimCSE.png'></img>
 
