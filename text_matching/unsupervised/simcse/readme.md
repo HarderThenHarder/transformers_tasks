@@ -18,7 +18,7 @@ pip install -r ../requirements.txt
 
 若想使用`自定义数据`训练，只需要仿照示例数据构建数据集即可：
 
-训练集：
+* 训练集：
 
 ```python
 喜欢打篮球的男生喜欢什么样的女生
@@ -30,7 +30,7 @@ pip install -r ../requirements.txt
 ...
 ```
 
-测试集：
+* 测试集：
 
 ```python
 开初婚未育证明怎么弄？	初婚未育情况证明怎么开？	1
