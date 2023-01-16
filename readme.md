@@ -4,7 +4,7 @@
 
 [![Author](https://img.shields.io/badge/Author-Pankeyu-green.svg "Author")](https://www.zhihu.com/column/c_1451236880973426688) [![OS](https://img.shields.io/badge/OS-Linux/Windows/Mac-red.svg "OS")](./) [![Based](https://img.shields.io/badge/Based-huggingface_transformers-blue.svg "OS")](./)
 
-[![Status](https://img.shields.io/badge/Status-WIP-darkslateblue.svg "Status")](./) [![Stars](https://img.shields.io/badge/Stars-40-yellow.svg "Stars")](./) [![Fork](https://img.shields.io/badge/Fork-7-sandybrown.svg "Stars")](./) [![Python](https://img.shields.io/badge/Python-3.6+-darkseagreen.svg "Python")](./)
+[![Status](https://img.shields.io/badge/Status-WIP-darkslateblue.svg "Status")](./) [![Stars](https://img.shields.io/badge/Stars-86-yellow.svg "Stars")](./) [![Fork](https://img.shields.io/badge/Fork-15-sandybrown.svg "Stars")](./) [![Python](https://img.shields.io/badge/Python-3.6+-darkseagreen.svg "Python")](./)
 
 </div>
 
