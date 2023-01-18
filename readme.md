@@ -8,6 +8,8 @@
 
 </div>
 
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=1AF783&center=true&vCenter=true&width=435&lines=Transformers%E3%80%80%E3%80%80%E3%80%80%E3%80%80%E3%80%80%E3%80%80GO!)](https://git.io/typing-svg)
+
 ---
 
 该项目集成了基于 [transformers](https://huggingface.co/docs/transformers/index) 库实现的多种 NLP 任务。
