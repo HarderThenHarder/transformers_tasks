@@ -6,9 +6,9 @@
 
 [![Status](https://img.shields.io/badge/Status-WIP-darkslateblue.svg "Status")](./) [![Stars](https://img.shields.io/badge/Stars-86-yellow.svg "Stars")](./) [![Fork](https://img.shields.io/badge/Fork-15-sandybrown.svg "Stars")](./) [![Python](https://img.shields.io/badge/Python-3.6+-darkseagreen.svg "Python")](./)
 
-</div>
-
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=1AF783&center=true&vCenter=true&width=435&lines=Transformers%E3%80%80%E3%80%80%E3%80%80%E3%80%80%E3%80%80%E3%80%80GO!)](https://git.io/typing-svg)
+
+</div>
 
 ---
 
