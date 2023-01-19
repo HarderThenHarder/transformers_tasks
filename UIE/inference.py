@@ -28,14 +28,16 @@ from transformers import AutoTokenizer
 
 from model import convert_inputs, get_bool_ids_greater_than, get_span
 
-device = 'cuda:1'                                             # 指定GPU设备
-saved_model_path = './checkpoints/simple_ner/model_best/'     # 训练模型存放地址
-tokenizer = AutoTokenizer.from_pretrained(saved_model_path) 
-model = torch.load(os.path.join(saved_model_path, 'model.pt'))
-model.to(device).eval()
 
-
-def inference(contents: List[str], prompts: List[str], max_length=512, prob_threshold=0.5) -> List[str]:
+def inference(
+    model,
+    tokenizer,
+    device: str,
+    contents: List[str], 
+    prompts: List[str], 
+    max_length=512, 
+    prob_threshold=0.5
+    ) -> List[str]:
     """
     输入 promot 和 content 列表，返回模型提取结果。    
 
@@ -56,7 +58,7 @@ def inference(contents: List[str], prompts: List[str], max_length=512, prob_thre
     Returns:
         List: 模型识别结果, e.g. -> [['琅琊榜'], ['电视剧']]
     """
-    inputs = convert_inputs(tokenizer, prompts, contents, max_length=50)
+    inputs = convert_inputs(tokenizer, prompts, contents, max_length=max_length)
     model_inputs = {
         'input_ids': inputs['input_ids'].to(device),
         'token_type_ids': inputs['token_type_ids'].to(device),
@@ -88,7 +90,15 @@ def inference(contents: List[str], prompts: List[str], max_length=512, prob_thre
     return res
 
 
-def event_extract_example(sentence: str, schema: dict, prob_threshold=0.6) -> dict:
+def event_extract_example(
+    model,
+    tokenizer,
+    device: str,
+    sentence: str, 
+    schema: dict, 
+    prob_threshold=0.6,
+    max_seq_len=128,
+    ) -> dict:
     """
     UIE事件抽取示例。
 
@@ -117,6 +127,9 @@ def event_extract_example(sentence: str, schema: dict, prob_threshold=0.6) -> di
     for trigger_prompt in trigger_prompts:
         rsp[trigger_prompt] = {}
         triggers = inference(
+            model,
+            tokenizer,
+            device,
             [sentence], 
             [trigger_prompt], 
             max_length=128, 
@@ -130,14 +143,81 @@ def event_extract_example(sentence: str, schema: dict, prob_threshold=0.6) -> di
                 res = inference(
                     contents, 
                     prompts,
-                    max_length=128, 
+                    max_length=max_seq_len, 
                     prob_threshold=prob_threshold)
                 for a, r in zip(arguments, res):
                     rsp[trigger_prompt][a] = r
-    print(rsp)
+    print('Event-Extraction Results: ', rsp)
 
 
-def ner_example(sentence: str, schema: list, prob_threshold=0.6) -> dict:
+def information_extract_example(
+    model,
+    tokenizer,
+    device: str,
+    sentence: str, 
+    schema: dict, 
+    prob_threshold=0.6, 
+    max_seq_len=128
+    ) -> dict:
+    """
+    UIE信息抽取示例。
+
+    Args:
+        sentence (str): 待抽取句子, e.g. -> '麻雀是几级保护动物？国家二级保护动物'
+        schema (dict): 事件定义字典, e.g. -> {
+                                            '主语': ['保护等级']
+                                        }
+        prob_threshold (float, optional): 置信度阈值（0~1），置信度越高则召回结果越少，越准确。
+    
+    Returns:
+        dict -> {
+                '麻雀': {
+                        '保护等级': ['国家二级']
+                    },
+                ...
+            }
+    """
+    rsp = {}
+    subject_prompts = list(schema.keys())
+
+    for subject_prompt in subject_prompts:
+        subjects = inference(
+            model,
+            tokenizer,
+            device,
+            [sentence], 
+            [subject_prompt], 
+            max_length=128, 
+            prob_threshold=prob_threshold)[0]
+        
+        for subject in subjects:
+            if subject:
+                rsp[subject] = {}
+                predicates = schema.get(subject_prompt)
+                contents = [sentence] * len(predicates)
+                prompts = [f"{subject}的{p}" for p in predicates]
+                res = inference(
+                    model,
+                    tokenizer,
+                    device,
+                    contents, 
+                    prompts,
+                    max_length=max_seq_len, 
+                    prob_threshold=prob_threshold
+                )
+                for p, r in zip(predicates, res):
+                    rsp[subject][p] = r
+    print('Information-Extraction Results: ', rsp)
+
+
+def ner_example(
+    model,
+    tokenizer,
+    device: str,
+    sentence: str, 
+    schema: list, 
+    prob_threshold=0.6
+    ) -> dict:
     """
     UIE做NER任务示例。
 
@@ -156,27 +236,43 @@ def ner_example(sentence: str, schema: list, prob_threshold=0.6) -> dict:
     rsp = {}
     sentences = [sentence] * len(schema)    #  一个prompt需要对应一个句子，所以要复制n遍句子
     res = inference(
+        model,
+        tokenizer,
+        device,
         sentences, 
         schema, 
         max_length=128, 
         prob_threshold=prob_threshold)
     for s, r in zip(schema, res):
         rsp[s] = r
-    print(rsp)
+    print('NER Results: ', rsp)
 
 
 if __name__ == "__main__":
     from rich import print
+    
+    device = 'cuda:0'                                             # 指定GPU设备
+    saved_model_path = './checkpoints/simple_ner/model_best/'     # 训练模型存放地址
+    tokenizer = AutoTokenizer.from_pretrained(saved_model_path) 
+    model = torch.load(os.path.join(saved_model_path, 'model.pt'))
+    model.to(device).eval()
+    
     sentence = '5月17号晚上10点35分从公司加班打车回家，36块五。'
     
     # NER 示例
     ner_example(
+        model,
+        tokenizer,
+        device,
         sentence=sentence, 
         schema=['出发地', '目的地', '时间']
     )
 
     # 事件抽取示例
     event_extract_example(
+        model,
+        tokenizer,
+        device,
         sentence=sentence, 
         schema={
                 '加班触发词': ['时间','地点'],
