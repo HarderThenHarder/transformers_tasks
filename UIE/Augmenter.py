@@ -176,9 +176,9 @@ class Augmenter(object):
         model, 
         tokenizer, 
         samples: Union[List[str], List[dict]],
-        negative_samples_file: str,
         inference_func,
-        details_file='details.log',
+        negative_samples_file=None,
+        details_file=None,
         device='cpu',
         max_seq_len=256,
         batch_size=64
@@ -204,15 +204,16 @@ class Augmenter(object):
             batch_size=batch_size
         )
 
-        print(predicate_error_dict, file=open(details_file, 'w', encoding='utf8'))
-        print('\n-- Error Count of Predicates --\n', file=open(details_file, 'a', encoding='utf8'))
-        error_count_dict = dict([(k, v['total_error']) for k, v in predicate_error_dict.items()])
-        error_count_dict = dict(sorted(error_count_dict.items(), key=lambda x: x[1], reverse=True))
-        print(f'Total Error: {sum(list(error_count_dict.values()))}', file=open(details_file, 'a', encoding='utf8'))
-        print(f'{error_count_dict}', file=open(details_file, 'a', encoding='utf8'))
-        print('\n-- Summary of Confused Predicates --\n', file=open(details_file, 'a', encoding='utf8'))
-        print(summary_dict, file=open(details_file, 'a', encoding='utf8'))
-        print(f'[Done] Model Performance details have saved at "{details_file}".')
+        if details_file:
+            print(predicate_error_dict, file=open(details_file, 'w', encoding='utf8'))
+            print('\n-- Error Count of Predicates --\n', file=open(details_file, 'a', encoding='utf8'))
+            error_count_dict = dict([(k, v['total_error']) for k, v in predicate_error_dict.items()])
+            error_count_dict = dict(sorted(error_count_dict.items(), key=lambda x: x[1], reverse=True))
+            print(f'Total Error: {sum(list(error_count_dict.values()))}', file=open(details_file, 'a', encoding='utf8'))
+            print(f'{error_count_dict}', file=open(details_file, 'a', encoding='utf8'))
+            print('\n-- Summary of Confused Predicates --\n', file=open(details_file, 'a', encoding='utf8'))
+            print(summary_dict, file=open(details_file, 'a', encoding='utf8'))
+            print(f'[Done] Model Performance details have saved at "{details_file}".')
 
         if type(samples[0]) == str:                                # 若传入的是文件路径，则读取全部的文件路径
             parse_samples = []
@@ -241,41 +242,27 @@ class Augmenter(object):
         
         negative_samples = [json.dumps(sample, ensure_ascii=False) for sample in negative_samples]
         negative_samples = list(set(negative_samples))
-        with open(negative_samples_file, 'w', encoding='utf8') as f:
-            for sample in negative_samples:
-                f.write(f'{sample}\n')
+        if negative_samples_file:
+            with open(negative_samples_file, 'w', encoding='utf8') as f:
+                for sample in negative_samples:
+                    f.write(f'{sample}\n')
+            print(f'[Done] Negative Samples have saved at "{negative_samples_file}".')
+        
+        return predicate_error_dict, summary_dict, negative_samples
 
-        print(f'[Done] Negative Samples have saved at "{negative_samples_file}".')
-    
     @staticmethod
-    def auto_add_uie_relation_positive_samples(
-        samples: Union[List[str], List[dict]],
-        positive_samples_file: str
-        ):
+    def add_positive_samples_by_swap_spo(samples: List[dict]):
         """
-        自动为UIE添加关系抽取的负例数据。
+        通过交换同Predicate的Subject和Object的方式，实现数据增强。
 
         Args:
-            model (_type_): fine-tuning 好的 UIE 模型
-            tokenizer (_type_): tokenizer
-            samples (Union(List[str], List[dict])): 数据集文件名列表（自动读取），或样本列表
-            positive_samples_file (str): 正例文件存放地址
+            samples (List[dict]): 原始数据中的样本
+
+        Returns:
+            positive_samples: 交换SO之后的正例
+            error_num: 交换失败的样本数
+            predicates_sentence_dict: 同P的句子样本
         """
-        assert type(samples) == list, '@params:samples must be [list] type.'
-        if type(samples[0]) == str:                                        # 若传入的是文件路径，则读取全部的文件路径
-            parse_samples = []
-            for sample_file in samples:
-                with open(sample_file, 'r', encoding='utf8') as f:
-                    for i, line in enumerate(f.readlines()):
-                        try:
-                            sample = json.loads(line)
-                            parse_samples.append(sample)
-                        except:
-                            print(f'[Error Line {i}] {line}')
-                            print(traceback.format_exc())
-                            exit()
-            samples = parse_samples
-        
         predicates_sentence_dict = {}                                                  # 将句子按照「predicate」为key的方式存储
         for sample in samples:
             if len(sample['result_list']) == 1 and '的' in sample['prompt']:           # 只处理宾语只有一个答案的样本
@@ -284,7 +271,7 @@ class Augmenter(object):
                     predicates_sentence_dict[predicate] = [sample]
                 else:
                     predicates_sentence_dict[predicate].append(sample)
-        
+
         positive_samples, error_num = [], 0
         for _, samples in predicates_sentence_dict.items():
             if len(samples) < 2:
@@ -292,7 +279,7 @@ class Augmenter(object):
             for sample in samples:
                 candidates = copy.deepcopy(samples)
                 candidates.remove(sample)
-                candidate = copy.deepcopy(random.choice(candidates))                        # 从同predicate的句子中随机选则一条，将当前的s和o替换过去
+                candidate = copy.deepcopy(random.choice(candidates))                     # 从同predicate的句子中随机选则一条，将当前的s和o替换过去
 
                 elements = sample['prompt'].split('的')              
                 cur_sub = '的'.join(elements[:-1])
@@ -320,14 +307,204 @@ class Augmenter(object):
                     })
                 else:
                     error_num += 1
-        # print('error samples in positive augment: ', error_num)
+        return positive_samples, error_num, predicates_sentence_dict
+    
+    @staticmethod
+    def add_positive_samples_by_mask_then_fill(
+        samples: List[dict],
+        filling_model,
+        filling_tokenzier,
+        batch_size,
+        max_seq_len,
+        device,
+        aug_num
+        ):
+        """
+        通过[MASK]非关键片段，再用filling模型还原掩码片段，实现数据增强。
+
+        Args:
+            samples (List[dict]): 原数据集中的样本(doccano导出数据), dict e.g -> {
+                "text": "Google was founded on September 4, 1998, by Larry Page and Sergey Brin.",
+                "entities": [
+                    {
+                        "id": 0,
+                        "start_offset": 0,
+                        "end_offset": 6,
+                        "label": "ORG"
+                    },
+                    ...
+                ],
+                "relations": [
+                    {
+                        "id": 0,
+                        "from_id": 0,
+                        "to_id": 1,
+                        "type": "foundedAt"
+                    },
+                    ...
+                ]
+            }
+            filling_model (_type_): 掩码还原模型
+            filling_tokenzier (_type_): 掩码还原模型tokenizer
+            aug_num (int): 一个样本增强几次
+
+        Raises:
+            ValueError: _description_
+            ValueError: _description_
+
+        Returns:
+            _type_: _description_
+        """
+        positive_samples = []
+        samples = [sample for sample in samples if len(sample['entities']) > 0]                    # 只增强正例
+        
+        for _ in range(aug_num):
+            for i in range(0, len(samples), batch_size):
+                batch_sapmle_texts, batch_samples = [], []
+                for sample in samples[i:i+batch_size]:
+                    text = list(sample['text'])
+                    key_spans = [[ele['start_offset'], ele['end_offset']] for ele in sample['entities']]   # 宾语span
+                    key_spans.sort(key=lambda x: x[0])                                      # 带有关键信息的span（不能被MASK）
+                    
+                    merged_key_spans = [key_spans[0]]                                       # 合并重叠的词区间
+                    for i in range(1, len(key_spans)):
+                        if key_spans[i][0] <= merged_key_spans[-1][1]:
+                            if key_spans[i][1] > merged_key_spans[-1][1]:
+                                merged_key_spans[i-1][1] = key_spans[i][1]
+                        else:
+                            merged_key_spans.append(key_spans[i])
+                    
+                    masked_span_candidates = []
+                    for i in range(len(merged_key_spans)):
+                        if i == 0:                                                           # 首区间处理
+                            if merged_key_spans[i][0] > 0:
+                                start = 0
+                                end = merged_key_spans[i][0]
+                                masked_span_candidates.append((start, end))
+                        else:
+                            start = merged_key_spans[i-1][1]
+                            end = merged_key_spans[i][0]
+                            if start < end:
+                                masked_span_candidates.append((start, end))
+                        if i == len(merged_key_spans) - 1:                                   # 尾区间处理
+                            if merged_key_spans[i][1] < len(text):
+                                start = merged_key_spans[i][1]
+                                end = len(text)
+                                masked_span_candidates.append((start, end))
+                    masked_span = random.choice(masked_span_candidates)
+                    masekd_text = text[:masked_span[0]] + ['[MASK]'] + text[masked_span[1]:]
+                    masekd_text = ''.join(masekd_text)
+                    masekd_text = f'"{masekd_text}"中[MASK]位置的文本是：'
+                    batch_sapmle_texts.append(masekd_text)
+                    batch_samples.append({
+                        'masked_span_start': masked_span[0],
+                        'masked_span_end': masked_span[1],
+                        'origin_text': sample['text'],
+                        'entities': sample['entities'],
+                        'relations': sample['relations']
+                    })
+
+                inputs = filling_tokenzier(
+                    text=batch_sapmle_texts,
+                    truncation=True,
+                    max_length=max_seq_len,
+                    padding='max_length',
+                    return_tensors='pt'
+                )
+                outputs = filling_model.generate(input_ids=inputs["input_ids"].to(device))         # 将[MASK]的部分通过filling模型还原
+                outputs = [filling_tokenzier.decode(output.cpu().numpy(), skip_special_tokens=True).replace(" ", "") \
+                                for output in outputs]
+                
+                for output, origin_sample in zip(outputs, batch_samples):
+                    origin_text = origin_sample['origin_text']                                      # 融合filling结果
+                    new_text = origin_text[:origin_sample['masked_span_start']] + \
+                                output + \
+                                origin_text[origin_sample['masked_span_end']:]
+                    new_entities_list = []
+                    for entity in origin_sample['entities']:                                        # 重算每一个key span在新文本中的开始/结束位置
+                        entity_text = origin_sample['origin_text'][entity['start_offset']:entity['end_offset']]
+                        start = new_text.find(entity_text)
+                        if start == -1:
+                            raise ValueError(f'Can not find span:{entity_text} in new_text: {new_text}, which origin sample is {origin_sample}.')
+                        end = start + len(entity_text)
+                        new_entities_list.append({
+                            'id': entity['id'],
+                            'start_offset': start,
+                            'end_offset': end,
+                            'label': entity['label'],
+                            'text': entity_text
+                        })
+                    positive_samples.append({
+                        'text': new_text,
+                        'entities': new_entities_list,
+                        'relations': origin_sample['relations']
+                    })
+        return positive_samples
+    
+    @staticmethod
+    def auto_add_uie_relation_positive_samples(
+        samples: Union[List[str], List[dict]],
+        positive_samples_file=None,
+        mode='rule',
+        **args
+        ):
+        """
+        自动为UIE添加关系抽取的正例数据。
+
+        Args:
+            samples (Union(List[str], List[dict])): 数据集文件名列表（自动读取），或样本（字典）列表
+            positive_samples_file (str): 正例文件存放地址, 若为空则不存到本地
+            mode (str): 正例增强的方式，
+                        'rule': 基于规则（同P的SO互换。
+                        'mask-then-fill': [MASK]非关键片段，再通过生成模型还原掩码片段。
+        """
+        assert type(samples) == list, '@params:samples must be [list] type.'
+        if type(samples[0]) == str:                                                   # 若传入的是文件路径，则读取全部的文件路径
+            parse_samples = []
+            for sample_file in samples:
+                with open(sample_file, 'r', encoding='utf8') as f:
+                    for i, line in enumerate(f.readlines()):
+                        try:
+                            sample = json.loads(line)
+                            parse_samples.append(sample)
+                        except:
+                            print(f'[Error Line {i}] {line}')
+                            print(traceback.format_exc())
+                            exit()
+            samples = parse_samples
+    
+        if mode == 'rule':
+            positive_samples, \
+                error_num, \
+                predicates_sentence_dict = Augmenter.add_positive_samples_by_swap_spo(samples)
+            print('error samples in positive augment: ', error_num)
+        elif mode == 'mask_then_fill':
+            if 'filling_model' not in args or 'filling_tokenizer' not in args:
+                raise ValueError('@param filling_model and @param filling_tokenizer must be specified.')
+            positive_samples = Augmenter.add_positive_samples_by_mask_then_fill(
+                samples,
+                args['filling_model'],
+                args['filling_tokenizer'],
+                batch_size=args['batch_size'] if 'batch_size' in args else 16,
+                max_seq_len=args['max_seq_len'] if 'max_seq_len' in args else 128,
+                device=args['device'] if 'device' in args else 'cpu',
+                aug_num=args['aug_num'] if 'aug_num' in args else 1
+            )
+        else:
+            raise ValueError(f'Invalid @param mode={mode}, check it again.')
         
         positive_samples = [json.dumps(sample, ensure_ascii=False) for sample in positive_samples]
         positive_samples = list(set(positive_samples))
-        with open(positive_samples_file, 'w', encoding='utf8') as f:
-            for sample in positive_samples:
-                f.write(f'{sample}\n')
-        print(f'[Done] Positive Samples have saved at {positive_samples_file}.')
+        if positive_samples_file:
+            with open(positive_samples_file, 'w', encoding='utf8') as f:
+                for sample in positive_samples:
+                    f.write(f'{sample}\n')
+            print(f'[Done] Positive Samples have saved at {positive_samples_file}.')
+        
+        if mode == 'rule':
+            return positive_samples, predicates_sentence_dict
+        elif mode == 'mask_then_fill':
+            return positive_samples
 
     @staticmethod
     def auto_find_uie_negative_predicates(

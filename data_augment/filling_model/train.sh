@@ -1,0 +1,15 @@
+python train.py \
+    --pretrained_model "uer/t5-base-chinese-cluecorpussmall" \
+    --save_dir "checkpoints/t5" \
+    --train_path "data/train.tsv" \
+    --dev_path "data/dev.tsv" \
+    --img_log_dir "logs" \
+    --img_log_name "T5-Base-Chinese" \
+    --batch_size 128 \
+    --max_source_seq_len 128 \
+    --max_target_seq_len 32 \
+    --learning_rate 1e-4 \
+    --num_train_epochs 20 \
+    --logging_steps 50 \
+    --valid_steps 500 \
+    --device cuda:0

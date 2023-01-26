@@ -147,7 +147,7 @@ def event_extract_example(
                     prob_threshold=prob_threshold)
                 for a, r in zip(arguments, res):
                     rsp[trigger_prompt][a] = r
-    print('Event-Extraction Results: ', rsp)
+    print('[+] Event-Extraction Results: ', rsp)
 
 
 def information_extract_example(
@@ -207,7 +207,7 @@ def information_extract_example(
                 )
                 for p, r in zip(predicates, res):
                     rsp[subject][p] = r
-    print('Information-Extraction Results: ', rsp)
+    print('[+] Information-Extraction Results: ', rsp)
 
 
 def ner_example(
@@ -245,37 +245,40 @@ def ner_example(
         prob_threshold=prob_threshold)
     for s, r in zip(schema, res):
         rsp[s] = r
-    print('NER Results: ', rsp)
+    print('[+] NER Results: ', rsp)
 
 
 if __name__ == "__main__":
     from rich import print
-    
-    device = 'cuda:0'                                             # 指定GPU设备
-    saved_model_path = './checkpoints/simple_ner/model_best/'     # 训练模型存放地址
+
+    device = 'cuda:0'                                       # 指定GPU设备
+    saved_model_path = './checkpoints/DuIE/model_best/'     # 训练模型存放地址
     tokenizer = AutoTokenizer.from_pretrained(saved_model_path) 
     model = torch.load(os.path.join(saved_model_path, 'model.pt'))
     model.to(device).eval()
-    
-    sentence = '5月17号晚上10点35分从公司加班打车回家，36块五。'
+
+    sentences = [
+        '谭孝曾是谭元寿的长子，也是谭派第六代传人。'
+    ]
     
     # NER 示例
-    ner_example(
-        model,
-        tokenizer,
-        device,
-        sentence=sentence, 
-        schema=['出发地', '目的地', '时间']
-    )
+    for sentence in sentences:
+        ner_example(
+            model,
+            tokenizer,
+            device,
+            sentence=sentence, 
+            schema=['人物']
+        )
 
-    # 事件抽取示例
-    event_extract_example(
-        model,
-        tokenizer,
-        device,
-        sentence=sentence, 
-        schema={
-                '加班触发词': ['时间','地点'],
-                '出行触发词': ['时间', '出发地', '目的地', '花费']
-            }
-    )
+    # SPO抽取示例
+    for sentence in sentences:
+        information_extract_example(
+            model,
+            tokenizer,
+            device,
+            sentence=sentence, 
+            schema={
+                    '人物': ['父亲'],
+                }
+        )
