@@ -14,6 +14,8 @@ UIE的官方文档在[这里](https://github.com/PaddlePaddle/PaddleNLP/tree/dev
 
 - [x] 信息抽取、事件抽取自分析负例生成（Auto Neg）策略（提升 precision）
 
+<br>
+
 ## 1. 环境安装
 
 本项目基于 `pytorch` + `transformers` 实现，运行前请安装相关依赖包：
@@ -21,6 +23,8 @@ UIE的官方文档在[这里](https://github.com/PaddlePaddle/PaddleNLP/tree/dev
 ```sh
 pip install -r ../requirements.txt
 ```
+
+<br>
 
 ## 2. 数据集准备
 
@@ -46,6 +50,8 @@ doccano导出数据如下所示：
 
 可以运行 `doccano.py` 来将标注数据（doccano）转换为训练数据（prompt）。
 
+
+<br>
 
 ## 3. 模型训练
 
@@ -93,6 +99,8 @@ best F1 performence has been updated: 0.00000 --> 0.82609
 在 `logs/UIE Base.png` 文件中将会保存训练曲线图：
 
 <img src='assets/UIE Base No Aug.png'></img>
+
+<br>
 
 ## 4. 模型预测
 
@@ -160,6 +168,8 @@ python inference.py
 }
 ```
 
+<br>
+
 ## 5. 数据增强（Data Augmentation）
 
 信息抽取/事件抽取的数据标注成本较高，因此我们提供几种针对小样本下的数据增强策略。
@@ -187,6 +197,7 @@ streamlit run web_da.py --server.port 8904
 ```
 在浏览器中访问 ip + 端口（默认8904）即可打开标注平台。
 
+<br>
 
 ### 5.1 正例：SwapSPO 策略介绍
 
@@ -208,6 +219,7 @@ Swap SPO 是一种基于规则的简单数据增强策略。
 
 <img src='assets/swap_spo.png'></img>
 
+<br>
 
 ### 5.2 正例：Mask Then Fill 策略介绍
 
@@ -244,6 +256,8 @@ filling_model_path = '这里'                                     # fine-tuned f
 
 <img src='assets/mask_then_fill.png'></img>
 
+<br>
+
 ### 5.3 负例：自分析负例生成（Auto Neg）策略介绍
 
 信息抽取中通常会存在 `P混淆` 的问题，例如：
@@ -263,6 +277,8 @@ prompt: 王文铭的去世年龄  answer: 76岁        -> 错误
 <img src='assets/auto_neg_2.png'></img>
 
 将新生成的负例加入 `原始训练数据集`，重新训练模型即可。
+
+<br>
 
 ### 5.4 各种 DA 策略的实验效果
 
