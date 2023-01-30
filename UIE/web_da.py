@@ -270,7 +270,7 @@ def main():
 
                 """, unsafe_allow_html=True)
             all_samples = get_doccano_samples()
-            aug_num = st.number_input('数据增强倍数', min_value=1, max_value=4, value=2)
+            aug_num = st.number_input('数据增强倍数', min_value=1, max_value=4, value=1)
         finish_button = st.button('开始生成正例')
         if finish_button:
             start = time.time()
@@ -283,7 +283,7 @@ def main():
                     st.session_state['predicates_sentence_dict'] = predicates_sentence_dict
                 elif da_mode == '基于模型（Mask Then Fill）':
                     if 'filling_model' not in st.session_state:
-                        st.session_state['filling_model'] = T5ForConditionalGeneration.from_pretrained(filling_model_path)
+                        st.session_state['filling_model'] = T5ForConditionalGeneration.from_pretrained(filling_model_path).to(device)
                         st.session_state['filling_tokenizer'] = AutoTokenizer.from_pretrained(filling_model_path)
                     positive_samples = Augmenter.auto_add_uie_relation_positive_samples(
                         all_samples,
