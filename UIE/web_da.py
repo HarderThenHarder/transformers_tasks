@@ -203,10 +203,11 @@ def get_model():
                     st.stop()
                 else:
                     tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
-                    if device == 'cpu':
-                        model = torch.load(model_path, map_location=torch.device('cpu'))
-                    else:
-                        model = torch.load(model_path)
+                    with st.spinner('模型加载中，请稍等...'):
+                        if device == 'cpu':
+                            model = torch.load(model_path, map_location=torch.device('cpu'))
+                        else:
+                            model = torch.load(model_path).to(device)
                     model.eval()
                     st.success('🎉 模型加载成功~')
         return model, tokenizer
