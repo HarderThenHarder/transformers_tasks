@@ -370,7 +370,7 @@ class Augmenter(object):
                     for i in range(1, len(key_spans)):
                         if key_spans[i][0] <= merged_key_spans[-1][1]:
                             if key_spans[i][1] > merged_key_spans[-1][1]:
-                                merged_key_spans[i-1][1] = key_spans[i][1]
+                                merged_key_spans[-1][1] = key_spans[i][1]
                         else:
                             merged_key_spans.append(key_spans[i])
                     
