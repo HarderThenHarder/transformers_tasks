@@ -313,7 +313,7 @@ class Augmenter(object):
     def add_positive_samples_by_mask_then_fill(
         samples: List[dict],
         filling_model,
-        filling_tokenzier,
+        filling_tokenizer,
         batch_size,
         max_seq_len,
         device,
@@ -345,7 +345,7 @@ class Augmenter(object):
                 ]
             }
             filling_model (_type_): 掩码还原模型
-            filling_tokenzier (_type_): 掩码还原模型tokenizer
+            filling_tokenizer (_type_): 掩码还原模型tokenizer
             aug_num (int): 一个样本增强几次
 
         Raises:
@@ -355,12 +355,16 @@ class Augmenter(object):
         Returns:
             _type_: _description_
         """
+        MAX_SEQ_LEN = 512                                # Filling模型最大输入长度
+        SUFFIX = '中[MASK]位置的文本是：'                   # 添加在每句话后的后缀
+        MAX_SENTENCE_LEN = MAX_SEQ_LEN - 2 - len(SUFFIX) # 原始输入句子的最大长度（除掉引号和后缀提示句）
+        
         positive_samples = []
-        samples = [sample for sample in samples if len(sample['entities']) > 0]                    # 只增强正例
+        samples = [sample for sample in samples if len(sample['entities']) > 0]            # 只增强正例
         
         for _ in range(aug_num):
             for i in range(0, len(samples), batch_size):
-                batch_sapmle_texts, batch_samples = [], []
+                batch_sample_texts, batch_samples = [], []
                 for sample in samples[i:i+batch_size]:
                     text = list(sample['text'])
                     key_spans = [[ele['start_offset'], ele['end_offset']] for ele in sample['entities']]   # 宾语span
@@ -392,10 +396,11 @@ class Augmenter(object):
                                 end = len(text)
                                 masked_span_candidates.append((start, end))
                     masked_span = random.choice(masked_span_candidates)
-                    masekd_text = text[:masked_span[0]] + ['[MASK]'] + text[masked_span[1]:]
-                    masekd_text = ''.join(masekd_text)
-                    masekd_text = f'"{masekd_text}"中[MASK]位置的文本是：'
-                    batch_sapmle_texts.append(masekd_text)
+                    masked_text = text[:masked_span[0]] + ['[MASK]'] + text[masked_span[1]:]
+                    masked_text = ''.join(masked_text)
+                    masked_text = masked_text[:MAX_SENTENCE_LEN]
+                    masked_text = f'"{masked_text}"{SUFFIX}'
+                    batch_sample_texts.append(masked_text)
                     batch_samples.append({
                         'masked_span_start': masked_span[0],
                         'masked_span_end': masked_span[1],
@@ -404,15 +409,15 @@ class Augmenter(object):
                         'relations': sample['relations']
                     })
 
-                inputs = filling_tokenzier(
-                    text=batch_sapmle_texts,
+                inputs = filling_tokenizer(
+                    text=batch_sample_texts,
                     truncation=True,
                     max_length=max_seq_len,
                     padding='max_length',
                     return_tensors='pt'
                 )
                 outputs = filling_model.generate(input_ids=inputs["input_ids"].to(device))         # 将[MASK]的部分通过filling模型还原
-                outputs = [filling_tokenzier.decode(output.cpu().numpy(), skip_special_tokens=True).replace(" ", "") \
+                outputs = [filling_tokenizer.decode(output.cpu().numpy(), skip_special_tokens=True).replace(" ", "") \
                                 for output in outputs]
                 
                 for output, origin_sample in zip(outputs, batch_samples):
@@ -455,7 +460,7 @@ class Augmenter(object):
             samples (Union(List[str], List[dict])): 数据集文件名列表（自动读取），或样本（字典）列表
             positive_samples_file (str): 正例文件存放地址, 若为空则不存到本地
             mode (str): 正例增强的方式，
-                        'rule': 基于规则（同P的SO互换。
+                        'rule': 基于规则，同P的SO互换。
                         'mask-then-fill': [MASK]非关键片段，再通过生成模型还原掩码片段。
         """
         assert type(samples) == list, '@params:samples must be [list] type.'
