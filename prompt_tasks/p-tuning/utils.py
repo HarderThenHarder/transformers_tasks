@@ -63,7 +63,6 @@ def convert_example(
     """
     tokenized_output = {
             'input_ids': [], 
-            'token_type_ids': [],
             'attention_mask': [],
             'mask_positions': [],                                           # 记录label的位置（即MASK Token的位置）
             'mask_labels': []                                               # 记录MASK Token的原始值（即Label值）
@@ -104,7 +103,11 @@ def convert_example(
                             i in range(max_label_len)]
 
         tokenized_output['input_ids'].append(input_ids)
-        tokenized_output['token_type_ids'].append(encoded_inputs['token_type_ids'])
+        if 'token_type_ids' in tokenized_output:                                            # 兼容不需要 token_type_id 的模型, e.g. Roberta-Base
+            if 'token_type_ids' not in tokenized_output:
+                tokenized_output['token_type_ids'] = [encoded_inputs['token_type_ids']]
+            else:
+                tokenized_output['token_type_ids'].append(encoded_inputs['token_type_ids'])
         tokenized_output['attention_mask'].append(encoded_inputs['attention_mask'])
         tokenized_output['mask_positions'].append(mask_positions)
 

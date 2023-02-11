@@ -38,6 +38,11 @@ from torch.utils.data import DataLoader
 from datasets import load_dataset
 from transformers import AutoModelForMaskedLM, AutoTokenizer, default_data_collator, get_scheduler
 
+from rich import print
+from rich.table import Table
+from rich.align import Align
+from rich.console import Console
+
 from iTrainingLogger import iSummaryWriter
 from class_metrics import ClassEvaluator
 from RDropLoss import RDropLoss
@@ -86,8 +91,11 @@ def evaluate_model(model, metric, data_loader, global_step, tokenizer, verbalize
 
     with torch.no_grad():
         for step, batch in enumerate(data_loader):
-            logits = model(input_ids=batch['input_ids'].to(args.device),
-                            token_type_ids=batch['token_type_ids'].to(args.device)).logits
+            if 'token_type_ids' in batch:
+                logits = model(input_ids=batch['input_ids'].to(args.device),
+                                token_type_ids=batch['token_type_ids'].to(args.device)).logits
+            else:                                                                                        # 兼容不需要 token_type_id 的模型, e.g. Roberta-Base
+                logits = model(input_ids=batch['input_ids'].to(args.device)).logits
             mask_labels = batch['mask_labels'].numpy().tolist()                                          # (batch, label_num)
             for i in range(len(mask_labels)):                                                            # 去掉label中的[PAD] token
                 while tokenizer.pad_token_id in mask_labels[i]:
@@ -104,7 +112,30 @@ def evaluate_model(model, metric, data_loader, global_step, tokenizer, verbalize
             eval_metric['class_metrics']
 
 
+def reset_console():
+    """
+    重置终端，便于打印log信息。
+    """
+    console = Console()
+    table = Table(show_footer=False)
+    table.title = ("[bold not italic]:robot:[/] Config Parameters")
+    table.add_column("key", no_wrap=True)
+    table.add_column("value", no_wrap=True)
+    
+    for arg in vars(args):
+        table.add_row(arg, str(getattr(args, arg)))
+    
+    table.caption = "You can change config in [b not dim]Source Code[/]"
+    table.columns[0].style = "bright_red"
+    table.columns[0].header_style = "bold bright_red"
+    table.columns[1].style = "bright_green"
+    table.columns[1].header_style = "bold bright_green"
+    table_centered = Align.center(table)
+    console.print(table_centered)
+
+
 def train():
+    reset_console()
     model = AutoModelForMaskedLM.from_pretrained(args.model)
     tokenizer = AutoTokenizer.from_pretrained(args.model)
     verbalizer = Verbalizer(
@@ -162,8 +193,11 @@ def train():
     global_step, best_f1 = 0, 0
     for epoch in range(args.num_train_epochs):
         for batch in train_dataloader:
-            logits = model(input_ids=batch['input_ids'].to(args.device),
-                            token_type_ids=batch['token_type_ids'].to(args.device)).logits
+            if 'token_type_ids' in batch:
+                logits = model(input_ids=batch['input_ids'].to(args.device),
+                                token_type_ids=batch['token_type_ids'].to(args.device)).logits
+            else:                                                                                        # 兼容不需要 token_type_id 的模型, e.g. Roberta-Base
+                logits = model(input_ids=batch['input_ids'].to(args.device)).logits
             mask_labels = batch['mask_labels'].numpy().tolist()
             sub_labels = verbalizer.batch_find_sub_labels(mask_labels)
             sub_labels = [ele['token_ids'] for ele in sub_labels]
@@ -176,13 +210,7 @@ def train():
                 kl_loss = rdrop_loss.compute_kl_loss(logits, logits2, device=args.device)
                 loss = ce_loss + kl_loss * args.rdrop_coef
             else:
-                # loss = mlm_loss(logits, batch['mask_positions'].to(args.device), sub_labels, criterion, 1.0, args.device)
-                loss = mlm_loss(logits, 
-                                batch['mask_positions'].to(args.device), 
-                                batch['mask_labels'].to(args.device), 
-                                criterion,
-                                1.0,
-                                args.device)
+                loss = mlm_loss(logits, batch['mask_positions'].to(args.device), sub_labels, criterion, 1.0, args.device)
             
             loss.backward()
             optimizer.step()
@@ -234,5 +262,4 @@ def train():
 
 
 if __name__ == '__main__':
-    from rich import print
     train()
