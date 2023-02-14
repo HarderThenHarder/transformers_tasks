@@ -213,7 +213,7 @@ texts = [
 平台使用 `streamlit` 搭建，因此使用前需要先安装三方包：
 
 ```sh
-pip install streamlit
+pip install streamlit==1.17.0
 ```
 
 随后，运行以下命令开启标注平台：
