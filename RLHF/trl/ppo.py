@@ -198,8 +198,8 @@ class PPOTrainer:
             logprobs = logprobs_from_logits(logits[:,:-1,:], input_ids[:,1:])           # (batch, seq_len - 1)
             ref_logprobs = logprobs_from_logits(ref_logits[:,:-1,:], input_ids[:,1:])   # (batch, seq_len - 1)
             for j in range(fbs):
-                start = len(query_batch[j])-1                                           # 拿到模型生成部分的信息（去掉prompt部分的信息）
-                end = len(query_batch[j]) + len(response_batch[j])-1
+                start = len(query_batch[j]) - 1                                           # 拿到模型生成部分的信息（去掉prompt部分的信息）
+                end = start + len(response_batch[j])
                 all_values.append(v[j, start:end])                                      # 生成的tokens的value
                 all_logprobs.append(logprobs[j, start:end])                             # 生成的tokens的概率
                 all_ref_logprobs.append(ref_logprobs[j, start:end])                     # ref model生成的tokens的概率
