@@ -141,6 +141,9 @@ def event_extract_example(
                 contents = [sentence] * len(arguments)
                 prompts = [f"{trigger}的{a}" for a in arguments]
                 res = inference(
+                    model,
+                    tokenizer,
+                    device,
                     contents, 
                     prompts,
                     max_length=max_seq_len, 
