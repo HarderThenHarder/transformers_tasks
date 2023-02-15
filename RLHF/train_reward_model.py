@@ -67,8 +67,8 @@ def evaluate_model(model, data_loader):
     """
     model.eval()
     with torch.no_grad():
+        batch_rank_rewards = []
         for batch in data_loader:
-            batch_rank_rewards = []
             for batch_idx in range(len(batch['input_ids'])):
                 rank_texts_count = len(batch['input_ids'][batch_idx])
                 rank_rewards = []
