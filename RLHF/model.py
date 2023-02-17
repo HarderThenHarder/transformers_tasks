@@ -93,7 +93,7 @@ def compute_rank_list_loss(rank_rewards_list: List[List[torch.tensor]], device='
     for rank_rewards in rank_rewards_list:
         for i in range(len(rank_rewards)-1):                                   # 遍历所有前项-后项的得分差
             for j in range(i+1, len(rank_rewards)):
-                diff = F.sigmoid(rank_rewards[i] - rank_rewards[j])            # sigmoid到0~1之间
+                diff = F.logsigmoid(rank_rewards[i] - rank_rewards[j])         # sigmoid到0~1之间
                 loss = loss + diff
                 add_count += 1
     loss = loss / add_count
