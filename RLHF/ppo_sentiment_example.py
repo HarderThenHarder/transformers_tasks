@@ -20,6 +20,7 @@ PPO + GPT2, 中文情感分析。
 Author: pankeyu
 Date: 2022/12/27
 """
+import os
 import time
 import random
 
@@ -38,7 +39,7 @@ from iTrainingLogger import iSummaryWriter
 
 writer = iSummaryWriter(log_path='./logs', log_name='PPO-Sentiment-Zh')
 config = {
-    "model_name": "uer/gpt2-chinese-cluecorpussmall",
+    "model_name": 'uer/gpt2-chinese-cluecorpussmall',
     "steps": 20000,
     "batch_size": 128,
     "forward_batch_size": 16,
@@ -52,7 +53,9 @@ config = {
     "cliprange": .2,
     "cliprange_value":.2,
     "vf_coef":.1,
-    "gen_len": 16
+    "gen_len": 16,
+    "save_freq": 5,
+    'save_dir': 'checkpoints/ppo_sentiment_gpt'
 }
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -110,7 +113,7 @@ for epoch in tqdm(range(total_ppo_epochs)):
     response_tensors = []
     for i in range(config['batch_size']):
         gen_len = config['gen_len']
-        response = gpt2_model.generate(query_tensors[i].unsqueeze(dim=0),
+        response = gpt2_model.generate(query_tensors[i].unsqueeze(dim=0),       # generate()用于直接生成token_id
                                        max_new_tokens=gen_len, **gen_kwargs)
         response_tensors.append(response.squeeze()[-gen_len:])
     batch['response'] = [gpt2_tokenizer.decode(r.squeeze()) for r in response_tensors]
@@ -154,3 +157,12 @@ for epoch in tqdm(range(total_ppo_epochs)):
     writer.add_scalar('ppo/policy/entropy', stats['ppo/policy/entropy'], epoch)
     writer.add_scalar('ppo/policy/policykl', stats['ppo/policy/policykl'], epoch)
     writer.record()
+
+    if epoch % config['save_freq'] == 0:
+        if not os.path.exists(config['save_dir']):
+            os.makedirs(config['save_dir'])
+        cur_save_path = os.path.join(
+            config['save_dir'], f'model_{epoch}_{round(float(logs["env/reward_mean"]), 2)}'
+        )
+        ppo_trainer.model.save_pretrained(cur_save_path)
+        ppo_trainer.tokenizer.save_pretrained(cur_save_path)
