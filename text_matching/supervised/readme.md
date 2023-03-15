@@ -12,7 +12,7 @@
 本项目基于 `pytorch` + `transformers` 实现，运行前请安装相关依赖包：
 
 ```sh
-pip install -r ../requirements.txt
+pip install -r ../../requirements.txt
 ```
 
 ## 2. 数据集准备
