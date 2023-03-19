@@ -96,3 +96,4 @@
 |---|---|
 | 文本分类（chatglm-6b-Based） | [[这里]](./LLM/readme.md) |
 | 文本匹配（chatglm-6b-Based） | [[这里]](./LLM/readme.md) |
+| 信息抽取（chatglm-6b-Based） | [[这里]](./LLM/readme.md) |
