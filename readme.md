@@ -85,3 +85,14 @@
 |---|---|
 | 中文问答模型（T5-Based） | [[这里]](./answer_generation/readme.md) |
 | Filling 模型（T5-Based） | [[这里]](./data_augment/filling_model/readme.md) |
+
+<br>
+
+#### 7. 大模型应用（LLM Application）
+
+> 尝试构建大模型（LLM）zero-shot 解决多种任务所需的 prompt pattern(s)。
+
+| 模型  | 传送门  |
+|---|---|
+| 文本分类（chatglm-6b-Based） | [[这里]](./LLM/readme.md) |
+| 文本匹配（chatglm-6b-Based） | [[这里]](./LLM/readme.md) |
