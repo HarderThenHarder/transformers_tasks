@@ -29,10 +29,12 @@ import datetime
 import torch
 import streamlit as st
 
-from peft import get_peft_model, LoraConfig, TaskType
-from transformers import AutoTokenizer
+from peft import PeftModel, PeftConfig
 
+from transformers import AutoTokenizer
 from modeling_chatglm import ChatGLMForConditionalGeneration
+
+torch.set_default_tensor_type(torch.cuda.HalfTensor)
 
 
 st.set_page_config(
@@ -40,7 +42,10 @@ st.set_page_config(
     layout="wide"
 )
 
-FINETUNE_MODEL_PATH = 'checkpoints/model_best/chatglm-lora.pt'
+
+device = 'cuda:0'
+max_new_tokens = 300
+peft_model_path = "checkpoints/model_1000"
 
 LOG_PATH = 'log'
 DATASET_PATH = 'data'
@@ -69,20 +74,19 @@ if 'model_out' not in st.session_state:
 
 if 'model' not in st.session_state:
     with st.spinner('Loading Model...'):
-        torch.set_default_tensor_type(torch.cuda.HalfTensor)
-        tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True)
-        model = ChatGLMForConditionalGeneration.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True, device_map='auto')
-        
-        peft_path = FINETUNE_MODEL_PATH
-        peft_config = LoraConfig(
-            task_type=TaskType.CAUSAL_LM, 
-            inference_mode=False,
-            r=8,
-            lora_alpha=32, 
-            lora_dropout=0.1
+        config = PeftConfig.from_pretrained(peft_model_path)
+        model = ChatGLMForConditionalGeneration.from_pretrained(
+            "THUDM/chatglm-6b", 
+            trust_remote_code=True
+        ).to(device)
+        model = PeftModel.from_pretrained(
+            model, 
+            peft_model_path
         )
-        model = get_peft_model(model, peft_config)
-        model.load_state_dict(torch.load(peft_path), strict=False)
+        tokenizer = AutoTokenizer.from_pretrained(
+            config.base_model_name_or_path, 
+            trust_remote_code=True
+        )
         st.session_state['model'] = model
         st.session_state['tokenizer'] = tokenizer
 
@@ -116,10 +120,10 @@ def start_evaluate_page():
                     input_text += f"Input: {current_input}\n"
                     input_text += f"Answer:"
                     batch = st.session_state['tokenizer'](input_text, return_tensors="pt")
-                    out = st.session_state['model'].generate(
-                        input_ids=batch["input_ids"],
-                        attention_mask=torch.ones_like(batch["input_ids"]).bool(),
-                        max_length=512,
+                    out = model.generate(
+                        input_ids=batch["input_ids"].to(device),
+                        attention_mask=torch.ones_like(batch["input_ids"]).bool().to(device),
+                        max_new_tokens=max_new_tokens,
                         temperature=0
                     )
                     out_text = st.session_state['tokenizer'].decode(out[0])
