@@ -94,6 +94,17 @@
 
 | 模型  | 传送门  |
 |---|---|
-| 文本分类（chatglm-6b-Based） | [[这里]](./LLM/readme.md) |
-| 文本匹配（chatglm-6b-Based） | [[这里]](./LLM/readme.md) |
-| 信息抽取（chatglm-6b-Based） | [[这里]](./LLM/readme.md) |
+| 文本分类（chatglm-6b-Based） | [[这里]](./LLM/zero-shot/readme.md) |
+| 文本匹配（chatglm-6b-Based） | [[这里]](./LLM/zero-shot/readme.md) |
+| 信息抽取（chatglm-6b-Based） | [[这里]](./LLM/zero-shot/readme.md) |
+
+
+<br>
+
+#### 8. 大模型微调（LLM Finetune）
+
+> 对大模型在多个指定任务上进行微调。
+
+| 模型  | 传送门  |
+|---|---|
+| ChatGLM-6B | [[这里]](./LLM/finetune/readme.md) |
