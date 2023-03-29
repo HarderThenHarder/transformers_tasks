@@ -25,7 +25,7 @@ conda create -n llm_env python=3.8
 2. 激活新建虚拟环境并安装响应的依赖包：
 
 ```sh
-conda create llm_env
+conda activate llm_env
 pip install -r requirements.txt
 ```
 
