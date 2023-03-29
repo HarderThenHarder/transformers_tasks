@@ -76,7 +76,8 @@ def get_masks_and_position_ids(
 
 def convert_example(
         examples: dict, 
-        tokenizer, 
+        tokenizer,
+        config, 
         max_source_seq_len: int,
         max_target_seq_len: int,
     ):
@@ -127,17 +128,16 @@ def convert_example(
             )                                               # 否则为 -> [_, token1, token2, [gMASK], <sop>]
 
             max_seq_len = max_source_seq_len + max_target_seq_len + 1
-            input_ids = prompts_ids + target_ids + [tokenizer.eos_token_id] * 2
+            input_ids = prompts_ids + target_ids + [config.eos_token_id]
 
             prompts_length = len(prompts_ids)
             labels = (
                 [-100] * (prompts_length - 1) + 
                 input_ids[prompts_length - 1:] + 
-                [tokenizer.eos_token_id] + 
-                [-100] * (max_seq_len - len(input_ids) - 1)
+                [-100] * (max_seq_len - len(input_ids))
             )
 
-            input_ids_with_padded = input_ids + [tokenizer.eos_token_id] * (max_seq_len - len(input_ids))
+            input_ids_with_padded = input_ids + [tokenizer.pad_token_id] * (max_seq_len - len(input_ids))
 
             """
             只有 target 部分的需要写 label，padding 和 prompts 不分不需要写，
