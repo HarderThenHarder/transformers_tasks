@@ -34,7 +34,7 @@ from datasets import load_dataset
 from torch.utils.data import DataLoader
 from torch.cuda.amp import autocast as autocast
 
-from transformers import AutoTokenizer, default_data_collator, get_scheduler
+from transformers import AutoTokenizer, AutoConfig, default_data_collator, get_scheduler
 from modeling_chatglm import ChatGLMForConditionalGeneration
 
 from rich import print
@@ -82,6 +82,18 @@ def save_tunable_parameters(model, path):
         k: v.to("cpu") for k, v in model.named_parameters() if v.requires_grad
     }
     torch.save(saved_params, path)
+
+
+def second2time(seconds: int):
+    """
+    将秒转换成时分秒。
+
+    Args:
+        seconds (int): _description_
+    """
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    return "%02d:%02d:%02d" % (h, m, s)
 
 
 def evaluate_model(model, data_loader):
@@ -171,6 +183,11 @@ def get_optimizer_and_scheler(model, train_dataloader):
 def main():
     reset_console()
     tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True)
+    config = AutoConfig.from_pretrained(
+        "THUDM/chatglm-6b", 
+        trust_remote_code=True, 
+        device_map='auto'
+    )
     model = ChatGLMForConditionalGeneration.from_pretrained(
         "THUDM/chatglm-6b",
         load_in_8bit=False, 
@@ -204,6 +221,7 @@ def main():
     convert_func = partial(
         convert_example, 
         tokenizer=tokenizer, 
+        config=config,
         max_source_seq_len=args.max_source_seq_len,
         max_target_seq_len=args.max_target_seq_len,
     )
@@ -232,13 +250,12 @@ def main():
     for epoch in range(1, args.num_train_epochs + 1):
         for batch in train_dataloader:
             with autocast():
-                outputs = model(
+                loss = model(
                     input_ids=batch['input_ids'].to(dtype=torch.long, device=args.device),
                     attention_mask=batch['attention_mask'].to(dtype=torch.bool, device=args.device),
                     position_ids= batch['position_ids'].to(dtype=torch.long, device=args.device),
                     labels=batch['labels'].to(dtype=torch.long, device=args.device)
-                )
-                loss = outputs.loss
+                ).loss
             loss.backward()
             optimizer.step()
             lr_scheduler.step()
@@ -250,16 +267,23 @@ def main():
                 time_diff = time.time() - tic_train
                 loss_avg = sum(loss_list) / len(loss_list)
                 writer.add_scalar('train/train_loss', loss_avg, global_step)
-                print("global step %d (%.2f%%) , epoch: %d, loss: %.5f, speed: %.2f step/s"
-                        % (global_step, global_step / max_train_steps * 100, epoch, loss_avg, args.logging_steps / time_diff))
+                print("global step %d ( %02.2f%% ) , epoch: %d, loss: %.5f, speed: %.2f step/s, ETA: %s"
+                        % (
+                    global_step, 
+                    global_step / max_train_steps * 100, 
+                    epoch, 
+                    loss_avg, 
+                    args.logging_steps / time_diff,
+                    second2time(int(max_train_steps - global_step) / (args.logging_steps / time_diff))
+                ))
                 tic_train = time.time()
 
             if global_step % args.save_freq == 0:
                 cur_save_dir = os.path.join(args.save_dir, "model_%d" % global_step)
                 if not os.path.exists(cur_save_dir):
                     os.makedirs(cur_save_dir)
-                save_tunable_parameters(model, os.path.join(cur_save_dir, "chatglm-lora.pt"))
-                print(f'Model has saved at {os.path.join(cur_save_dir, "chatglm-lora.pt")}.')
+                model.save_pretrained(cur_save_dir)
+                print(f'Model has saved at {cur_save_dir}.')
 
                 eval_loss = evaluate_model(model, eval_dataloader)
                 writer.add_scalar('eval/evaluate_loss', eval_loss, global_step)
@@ -274,8 +298,8 @@ def main():
                     cur_save_dir = os.path.join(args.save_dir, "model_best")
                     if not os.path.exists(cur_save_dir):
                         os.makedirs(cur_save_dir)
-                    save_tunable_parameters(model, os.path.join(cur_save_dir, "chatglm-lora.pt"))
-                    print(f'Best model has saved at {os.path.join(cur_save_dir, "chatglm-lora.pt")}.')
+                    model.save_pretrained(cur_save_dir)
+                    print(f'Best model has saved at {cur_save_dir}.')
                 tic_train = time.time()
 
     print(f'done.')

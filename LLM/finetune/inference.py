@@ -20,30 +20,34 @@ inference 训练好的模型。
 Author: pankeyu
 Date: 2023/03/17
 """
-
 import torch
-from peft import get_peft_model, LoraConfig, TaskType
+from peft import PeftModel, PeftConfig
 
 from transformers import AutoTokenizer
 from modeling_chatglm import ChatGLMForConditionalGeneration
 
-
 torch.set_default_tensor_type(torch.cuda.HalfTensor)
-tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True)
-model = ChatGLMForConditionalGeneration.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True, device_map='auto')
 
-peft_path = "checkpoints/model_best/chatglm-lora.pt"
-peft_config = LoraConfig(
-    task_type=TaskType.CAUSAL_LM, 
-    inference_mode=False,
-    r=8,
-    lora_alpha=32, 
-    lora_dropout=0.1
+
+device = 'cuda:0'
+max_new_tokens = 300
+peft_model_path = "checkpoints/model_1000"
+config = PeftConfig.from_pretrained(peft_model_path)
+
+model = ChatGLMForConditionalGeneration.from_pretrained(
+    "THUDM/chatglm-6b", 
+    trust_remote_code=True
+).to(device)
+
+model = PeftModel.from_pretrained(
+    model, 
+    peft_model_path
 )
 
-max_seq_len = 400
-model = get_peft_model(model, peft_config)
-model.load_state_dict(torch.load(peft_path), strict=False)
+tokenizer = AutoTokenizer.from_pretrained(
+    config.base_model_name_or_path, 
+    trust_remote_code=True
+)
 
 
 def inference(
@@ -67,9 +71,9 @@ def inference(
         input_text += f"Answer: "
         batch = tokenizer(input_text, return_tensors="pt")
         out = model.generate(
-            input_ids=batch["input_ids"],
-            attention_mask=torch.ones_like(batch["input_ids"]).bool(),
-            max_length=max_seq_len,
+            input_ids=batch["input_ids"].to(device),
+            attention_mask=torch.ones_like(batch["input_ids"]).bool().to(device),
+            max_new_tokens=max_new_tokens,
             temperature=0
         )
         out_text = tokenizer.decode(out[0])
@@ -97,5 +101,3 @@ if __name__ == '__main__':
             sample['input']
         )
         print(res)
-
-
