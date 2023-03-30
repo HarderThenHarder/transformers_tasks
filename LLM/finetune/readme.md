@@ -4,7 +4,9 @@ LLM（Large Language Model）通常拥有大量的先验知识，使得其在许
 
 但，想要直接利用 LLM 完成一些任务会存在一些答案解析上的困难，如规范化输出格式，严格服从输入信息等。
 
-因此，在这个项目下我们尝试对大模型 [ChatGLM-6B](https://github.com/THUDM/ChatGLM-6B) 进行 Finetune，使其能够更好的对齐我们所需要的输出格式。
+> Zero-Shot 实验代码在 [这里](../zero-shot/readme.md)。
+
+因此，在这个项目下我们参考 [这里](https://github.com/mymusise/ChatGLM-Tuning/tree/master) 的代码，尝试对大模型 [ChatGLM-6B](https://github.com/THUDM/ChatGLM-6B) 进行 Finetune，使其能够更好的对齐我们所需要的输出格式。
 
 <br>
 
@@ -23,7 +25,7 @@ conda create -n llm_env python=3.8
 2. 激活新建虚拟环境并安装响应的依赖包：
 
 ```sh
-conda create llm_env
+conda activate llm_env
 pip install -r requirements.txt
 ```
 
@@ -178,7 +180,7 @@ peft_config = LoraConfig(
 streamlit run playground_local.py --server.port 8001
 ```
 
-在浏览器中打开对应的 `ip:port` 即可访问。
+在浏览器中打开对应的 `机器ip:port` 即可访问。
 
 <div align='center'><img src='assets/playground.png'></div>
 
@@ -193,7 +195,7 @@ streamlit run playground_local.py --server.port 8001
 streamlit run playground_local.py --server.port 8001
 ```
 
-在浏览器中打开对应的 `ip:port` 即可访问。
+在浏览器中打开对应的 `机器ip:port` 即可访问。
 
 <table>
 <tr>
