@@ -163,16 +163,10 @@ Used 00:13:05.
 修改训练模型的存放路径，运行 `python inference.py` 以测试训练好模型的效果：
 
 ```python
-...
-
-peft_path = "checkpoints/model_best/chatglm-lora.pt"        # 训练模型存放路径
-peft_config = LoraConfig(
-    task_type=TaskType.CAUSAL_LM, 
-    inference_mode=False,
-    r=8,
-    lora_alpha=32, 
-    lora_dropout=0.1
-)
+device = 'cuda:0'
+max_new_tokens = 300
+peft_model_path = "checkpoints/model_1000"      # 训练模型存放路径
+config = PeftConfig.from_pretrained(peft_model_path)
 ...
 ```
 
