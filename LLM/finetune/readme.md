@@ -4,15 +4,13 @@ LLM（Large Language Model）通常拥有大量的先验知识，使得其在许
 
 但，想要直接利用 LLM 完成一些任务会存在一些答案解析上的困难，如规范化输出格式，严格服从输入信息等。
 
-> Zero-Shot 实验代码在 [这里](../zero-shot/readme.md)。
-
-因此，在这个项目下我们参考 [这里](https://github.com/mymusise/ChatGLM-Tuning/tree/master) 的代码，尝试对大模型 [ChatGLM-6B](https://github.com/THUDM/ChatGLM-6B) 进行 Finetune，使其能够更好的对齐我们所需要的输出格式。
+因此，在这个项目下我们尝试对大模型 [ChatGLM-6B](https://github.com/THUDM/ChatGLM-6B) 进行 Finetune，使其能够更好的对齐我们所需要的输出格式。
 
 <br>
 
 ## 1. 环境安装
 
-由于 ChatGLM 需要的环境和该项目中其他实验中的环境有所不同，因此我们强烈建议您创建一个新的虚拟环境来执行该目录下的全部代码。
+由于 ChatGLM 需要用的 `pytorch 2.0` 的环境，这和该项目中其他实验中的环境有所不同，因此我们强烈建议您创建一个新的虚拟环境来执行该目录下的全部代码。
 
 下面，我们将以 `Anaconda` 为例，展示如何快速搭建一个环境：
 
@@ -25,7 +23,7 @@ conda create -n llm_env python=3.8
 2. 激活新建虚拟环境并安装响应的依赖包：
 
 ```sh
-conda activate llm_env
+conda create llm_env
 pip install -r requirements.txt
 ```
 
@@ -80,7 +78,9 @@ Instruction 部分告诉模型现在需要做「阅读理解」任务，Input �
 
 ## 3. 模型训练
 
-运行 `train.sh` 文件，根据自己 GPU 的显存调节 `batch_size`, `max_source_seq_len`, `max_target_seq_len` 参数（暂不支持多卡训练）：
+### 3.1 单卡训练
+
+运行 `train.sh` 文件，根据自己 GPU 的显存调节 `batch_size`, `max_source_seq_len`, `max_target_seq_len` 参数：
 
 ```sh
 python train.py \
@@ -104,14 +104,14 @@ python train.py \
 
 ```python
 ...
-global step 1700 (62.82%) , epoch: 2, loss: 0.58667, speed: 1.28 step/s
-global step 1800 (66.52%) , epoch: 2, loss: 0.55911, speed: 1.28 step/s
-global step 1900 (70.21%) , epoch: 3, loss: 0.53448, speed: 1.28 step/s
-global step 2000 (73.91%) , epoch: 3, loss: 0.51127, speed: 1.28 step/s
-Model has saved at checkpoints/model_2000/chatglm-lora.pt.
-Evaluation Loss: 0.12003
-Min eval loss has been updated: 0.14775 --> 0.12003
-Best model has saved at checkpoints/model_best/chatglm-lora.pt.
+global step 900 ( 49.89% ) , epoch: 1, loss: 0.78065, speed: 1.25 step/s, ETA: 00:12:05
+global step 1000 ( 55.43% ) , epoch: 2, loss: 0.71768, speed: 1.25 step/s, ETA: 00:10:44
+Model has saved at checkpoints/model_1000.
+Evaluation Loss: 0.17297
+Min eval loss has been updated: 0.26805 --> 0.17297
+Best model has saved at checkpoints/model_best.
+global step 1100 ( 60.98% ) , epoch: 2, loss: 0.66633, speed: 1.24 step/s, ETA: 00:09:26
+global step 1200 ( 66.52% ) , epoch: 2, loss: 0.62207, speed: 1.24 step/s, ETA: 00:08:06
 ...
 ```
 
@@ -120,6 +120,39 @@ Best model has saved at checkpoints/model_best/chatglm-lora.pt.
 <div align='center'><img src='assets/ChatGLM Fine-Tune.png'></div>
 
 <br>
+
+### 3.2 多卡训练
+
+运行 `train_multi_gpu.sh` 文件，通过 `CUDA_VISIBLE_DEVICES` 指定可用显卡，`num_processes` 指定使用显卡数：
+
+```sh
+CUDA_VISIBLE_DEVICES=0,1 accelerate launch --multi_gpu --mixed_precision=fp16 --num_processes=2 train_multi_gpu.py \
+    --train_path data/mixed_train_dataset.jsonl \
+    --dev_path data/mixed_dev_dataset.jsonl \
+    --lora_rank 8 \
+    --batch_size 1 \
+    --num_train_epochs 2 \
+    --save_freq 500 \
+    --learning_rate 3e-5 \
+    --logging_steps 100 \
+    --max_source_seq_len 400 \
+    --max_target_seq_len 300 \
+    --save_dir checkpoints_parrallel/ \
+    --img_log_dir "log/fintune_log" \
+    --img_log_name "ChatGLM Fine-Tune(parallel)"
+```
+
+相同数据集下，单卡使用时间：
+
+```python
+Used 00:27:18.
+```
+
+多卡（2并行）使用时间：
+
+```python
+Used 00:13:05.
+```
 
 ## 4. 模型预测
 
@@ -145,14 +178,14 @@ peft_config = LoraConfig(
 streamlit run playground_local.py --server.port 8001
 ```
 
-在浏览器中打开对应的 `机器ip:8001` 即可访问。
+在浏览器中打开对应的 `ip:port` 即可访问。
 
 <div align='center'><img src='assets/playground.png'></div>
 
 
 <br>
 
-## 5. Instruction & Label 标注平台
+## 5. 标注平台
 
 如果您需要标注自己的数据，也可以在 Playground 中完成。
 
@@ -160,7 +193,7 @@ streamlit run playground_local.py --server.port 8001
 streamlit run playground_local.py --server.port 8001
 ```
 
-在浏览器中打开对应的 `机器ip:8001` 即可访问。
+在浏览器中打开对应的 `ip:port` 即可访问。
 
 <table>
 <tr>
