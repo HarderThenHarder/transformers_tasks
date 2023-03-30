@@ -12,7 +12,7 @@ LLM（Large Language Model）通常拥有大量的先验知识，使得其在许
 
 ## 1. 环境安装
 
-由于 ChatGLM 需要用的 `pytorch 2.0` 的环境，这和该项目中其他实验中的环境有所不同，因此我们强烈建议您创建一个新的虚拟环境来执行该目录下的全部代码。
+由于 ChatGLM 需要的环境和该项目中其他实验中的环境有所不同，因此我们强烈建议您创建一个新的虚拟环境来执行该目录下的全部代码。
 
 下面，我们将以 `Anaconda` 为例，展示如何快速搭建一个环境：
 
@@ -180,7 +180,7 @@ peft_config = LoraConfig(
 streamlit run playground_local.py --server.port 8001
 ```
 
-在浏览器中打开对应的 `机器ip:port` 即可访问。
+在浏览器中打开对应的 `机器ip:8001` 即可访问。
 
 <div align='center'><img src='assets/playground.png'></div>
 
@@ -195,7 +195,7 @@ streamlit run playground_local.py --server.port 8001
 streamlit run playground_local.py --server.port 8001
 ```
 
-在浏览器中打开对应的 `机器ip:port` 即可访问。
+在浏览器中打开对应的 `机器ip:8001` 即可访问。
 
 <table>
 <tr>
