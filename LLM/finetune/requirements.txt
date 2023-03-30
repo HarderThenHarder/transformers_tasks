@@ -5,3 +5,4 @@ cpm_kernels
 streamlit==1.17.0
 matplotlib
 datasets==2.10.1
+accelerate==0.17.1
