@@ -34,8 +34,7 @@ from datasets import load_dataset
 from torch.utils.data import DataLoader
 from torch.cuda.amp import autocast as autocast
 
-from transformers import AutoTokenizer, AutoConfig, default_data_collator, get_scheduler
-from modeling_chatglm import ChatGLMForConditionalGeneration
+from transformers import AutoTokenizer, AutoConfig, AutoModel, default_data_collator, get_scheduler
 
 from rich import print
 from rich.table import Table
@@ -67,7 +66,6 @@ parser.add_argument("--img_log_dir", default='logs', type=str, help="Logging ima
 parser.add_argument("--img_log_name", default='Model Performance', type=str, help="Logging image file name.")
 parser.add_argument("--lora_rank", default=8, type=int, help="LoRA Rank.")
 args = parser.parse_args()
-
 
 writer = iSummaryWriter(log_path=args.img_log_dir, log_name=args.img_log_name)
 
@@ -111,8 +109,6 @@ def evaluate_model(model, data_loader):
             with autocast():
                 loss = model(
                     input_ids=batch['input_ids'].to(dtype=torch.long, device=args.device),
-                    attention_mask=batch['attention_mask'].to(dtype=torch.bool, device=args.device),
-                    position_ids= batch['position_ids'].to(dtype=torch.long, device=args.device),
                     labels=batch['labels'].to(dtype=torch.long, device=args.device)
                 ).loss
             loss_list.append(float(loss.cpu().detach()))
@@ -188,7 +184,7 @@ def main():
         trust_remote_code=True, 
         device_map='auto'
     )
-    model = ChatGLMForConditionalGeneration.from_pretrained(
+    model = AutoModel.from_pretrained(
         "THUDM/chatglm-6b",
         load_in_8bit=False, 
         trust_remote_code=True
@@ -252,8 +248,6 @@ def main():
             with autocast():
                 loss = model(
                     input_ids=batch['input_ids'].to(dtype=torch.long, device=args.device),
-                    attention_mask=batch['attention_mask'].to(dtype=torch.bool, device=args.device),
-                    position_ids= batch['position_ids'].to(dtype=torch.long, device=args.device),
                     labels=batch['labels'].to(dtype=torch.long, device=args.device)
                 ).loss
             loss.backward()
@@ -280,8 +274,6 @@ def main():
 
             if global_step % args.save_freq == 0:
                 cur_save_dir = os.path.join(args.save_dir, "model_%d" % global_step)
-                if not os.path.exists(cur_save_dir):
-                    os.makedirs(cur_save_dir)
                 model.save_pretrained(cur_save_dir)
                 print(f'Model has saved at {cur_save_dir}.')
 
@@ -296,8 +288,6 @@ def main():
                     )
                     best_eval_loss = eval_loss
                     cur_save_dir = os.path.join(args.save_dir, "model_best")
-                    if not os.path.exists(cur_save_dir):
-                        os.makedirs(cur_save_dir)
                     model.save_pretrained(cur_save_dir)
                     print(f'Best model has saved at {cur_save_dir}.')
                 tic_train = time.time()

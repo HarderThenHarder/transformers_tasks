@@ -34,8 +34,7 @@ from datasets import load_dataset
 from torch.utils.data import DataLoader
 from torch.cuda.amp import autocast as autocast
 
-from transformers import AutoTokenizer, AutoConfig, default_data_collator, get_scheduler
-from modeling_chatglm import ChatGLMForConditionalGeneration
+from transformers import AutoTokenizer, AutoConfig, AutoModel, default_data_collator, get_scheduler
 
 from rich import print
 from rich.table import Table
@@ -63,9 +62,9 @@ parser.add_argument("--max_target_seq_len", default=512, type=int,help="The maxi
     "than this will be truncated, sequences shorter will be padded.", )
 parser.add_argument("--batch_size", default=16, type=int, help="Batch size per GPU/CPU for training.", )
 parser.add_argument("--learning_rate", default=5e-5, type=float, help="The initial learning rate for Adam.")
-parser.add_argument("--weight_decay", default=0.0, type=float, help="Weight decay if we apply some.")
+parser.add_argument("--weight_decay", default=0.001, type=float, help="Weight decay if we apply some.")
 parser.add_argument("--num_train_epochs", default=10, type=int, help="Total number of training epochs to perform.")
-parser.add_argument("--warmup_ratio", default=0.0, type=float, help="Linear warmup over warmup_ratio * total_steps.")
+parser.add_argument("--warmup_ratio", default=0.1, type=float, help="Linear warmup over warmup_ratio * total_steps.")
 parser.add_argument("--save_freq", default=200, type=int, required=False, help="evaluate frequecny.")
 parser.add_argument("--logging_steps", default=10, type=int, help="log interval.")
 parser.add_argument("--img_log_dir", default='logs', type=str, help="Logging image path.")
@@ -107,8 +106,6 @@ def evaluate_model(model, data_loader):
         for batch in data_loader:
             loss = model(
                 input_ids=batch['input_ids'].to(dtype=torch.long),
-                attention_mask=batch['attention_mask'].to(dtype=torch.bool),
-                position_ids= batch['position_ids'].to(dtype=torch.long),
                 labels=batch['labels'].to(dtype=torch.long)
             ).loss
             loss_list.append(float(loss.cpu().detach()))
@@ -187,7 +184,7 @@ def main():
         trust_remote_code=True, 
         device_map='auto'
     )
-    model = ChatGLMForConditionalGeneration.from_pretrained(
+    model = AutoModel.from_pretrained(
         "THUDM/chatglm-6b",
         load_in_8bit=False, 
         trust_remote_code=True
@@ -257,8 +254,6 @@ def main():
             optimizer.zero_grad()
             loss = model(
                 input_ids=batch['input_ids'].to(dtype=torch.long),
-                attention_mask=batch['attention_mask'].to(dtype=torch.bool),
-                position_ids= batch['position_ids'].to(dtype=torch.long),
                 labels=batch['labels'].to(dtype=torch.long)
             ).loss
             accelerator.backward(loss)
@@ -284,31 +279,22 @@ def main():
                     ))
                     tic_train = time.time()
 
-            if global_step % args.save_freq == 0:
+            if global_step % args.save_freq == 0 and local_rank == 0:
                 cur_save_dir = os.path.join(args.save_dir, "model_%d" % global_step)
-                
-                if not os.path.exists(cur_save_dir):
-                    os.makedirs(cur_save_dir)
-                
-                if local_rank == 0:
-                    model.module.save_pretrained(cur_save_dir)
-                    print(f'Model has saved at {cur_save_dir}.')
+                model.module.save_pretrained(cur_save_dir)
+                print(f'Model has saved at {cur_save_dir}.')
 
                 eval_loss = evaluate_model(model, eval_dataloader)
                 writer.add_scalar('eval/evaluate_loss', eval_loss, global_step)
                 writer.record()
-                
-                if local_rank == 0:
-                    print("Evaluation Loss: %.5f" % (eval_loss))
-                
-                if eval_loss < best_eval_loss and local_rank == 0:
+            
+                print("Evaluation Loss: %.5f" % (eval_loss))
+                if eval_loss < best_eval_loss:
                     print(
                         f"Min eval loss has been updated: {best_eval_loss:.5f} --> {eval_loss:.5f}"
                     )
                     best_eval_loss = eval_loss
                     cur_save_dir = os.path.join(args.save_dir, "model_best")
-                    if not os.path.exists(cur_save_dir):
-                        os.makedirs(cur_save_dir)
                     model.module.save_pretrained(cur_save_dir)
                     print(f'Best model has saved at {cur_save_dir}.')
 
