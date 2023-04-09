@@ -26,6 +26,7 @@ Reference:
 """
 import os
 import time
+import copy
 import argparse
 from functools import partial
 
@@ -155,15 +156,9 @@ def save_model(
         cur_save_path (str): 存储路径。
     """
     if args.use_lora:                       # merge lora params with origin model
-        key_list = [key for key, _ in model.base_model.model.named_modules() if "lora" not in key]
-        for key in key_list:
-            parent, target, target_name = model.base_model._get_submodules(key)
-            if isinstance(target, peft.tuners.lora.Linear):
-                bias = target.bias is not None
-                new_module = nn.Linear(target.in_features, target.out_features, bias=bias)
-                model.base_model._replace_module(parent, target_name, new_module, target)
-        model = model.base_model.model
-        model.save_pretrained(cur_save_dir)
+        merged_model = copy.deepcopy(model)
+        merged_model = merged_model.merge_and_unload()
+        merged_model.save_pretrained(cur_save_dir)
     else:
         model.save_pretrained(cur_save_dir)
 
