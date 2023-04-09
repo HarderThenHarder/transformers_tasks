@@ -30,17 +30,16 @@ from tqdm import tqdm
 def convert_example(
         examples: dict, 
         tokenizer,
-        config, 
         max_source_seq_len: int,
         max_target_seq_len: int,
     ):
     """
-    将样本数据转换为模型接收的输入数据。
+    将样本数据转换为Ptuning模型接收的输入数据。
 
     Args:
         examples (dict): 训练数据样本, e.g. -> {
                                                 "text": [
-                                                            '{"context": "年基准利率4.35%。从实际看...", "answer": "年基准利率4.35%", "question": "2017年银行贷款基准利率", "id": 0}',
+                                                            '{"context": "年基准利率4.35%。从实际看...", "target": "2017年银行贷款基准利率"}',
                                                             ...
                                                 ]
                                             }
@@ -50,15 +49,16 @@ def convert_example(
     Returns:
         dict (str: np.array) -> tokenized_output = {
                             'input_ids': [[1525, 10, ...], [758, 2345, ...]], 
-                            'attention_mask': [[1, 1, ...], [1, 1, ...]],
                             'labels': [[822, 10, ...], [125, 58...]]
                         }
     """
     tokenized_output = {
-            'input_ids': [],
-            'labels': []
-        }
-    
+        'input_ids': [],
+        'labels': []
+    }
+
+    max_seq_length = max_source_seq_len + max_target_seq_len
+
     for example in examples['text']:
         try:
             example = json.loads(example)
@@ -67,68 +67,35 @@ def convert_example(
 
             prompts_ids = tokenizer.encode(
                 text=context,
-                max_length=max_source_seq_len,
-                truncation=True
+                add_special_tokens=False
             )
 
             target_ids = tokenizer.encode(
                 text=target,
-                max_length=max_target_seq_len,
-                truncation=True,
-                add_special_tokens=False                    # 设置为False，则会 -> [_, token1, token2, ...], 
-            )                                               # 否则为 -> [_, token1, token2, [gMASK], <sop>]
+                add_special_tokens=False
+            )                    
 
-            max_seq_len = max_source_seq_len + max_target_seq_len + 1
-            input_ids = prompts_ids + target_ids + [config.eos_token_id]
+            if len(prompts_ids) >= max_source_seq_len:                                          # source 需要留一个 [gMASK] token 在结尾
+                prompts_ids = prompts_ids[:max_source_seq_len - 1]
 
-            prompts_length = len(prompts_ids)
-            labels = (
-                [-100] * (prompts_length - 1) + 
-                input_ids[prompts_length - 1:] + 
-                [-100] * (max_seq_len - len(input_ids))
-            )
+            if len(target_ids) >= max_target_seq_len - 1:                                       # target 需要留一个 <sop> 在开头和一个 <eop> token 在结尾
+                target_ids = target_ids[:max_target_seq_len - 2]
 
-            input_ids_with_padded = input_ids + [tokenizer.pad_token_id] * (max_seq_len - len(input_ids))
+            input_ids = tokenizer.build_inputs_with_special_tokens(prompts_ids, target_ids)     # source_ids + [gMASK] + <sop> + target_ids + <eop>
+            context_length = input_ids.index(tokenizer.bos_token_id)                            # bos 在 target 的第一位
+            mask_position = context_length - 1                                                  # [gMASK] 在 source 的最后一位
+            labels = [-100] * context_length + input_ids[mask_position + 1:]                    # 从 bos 开始到后面所有的 target 到 eos 都为 label
 
-            """
-            只有 target 部分的需要写 label，padding 和 prompts 不分不需要写，
-            
-            因此，需要进行错位，以 
-                
-                prompt = '测试输入'
-                target = '测试输出'
-                max_source_seq_len=5,
-                max_target_seq_len=5
+            pad_len = max_seq_length - len(input_ids)
+            input_ids = input_ids + [tokenizer.pad_token_id] * pad_len
+            labels = labels + [-100] * pad_len
 
-            
-            为例，错位后的 input 和 label 如下：
-
-                input       ->        label
-                ▁           ->        <image_-100>
-                测试         ->        <image_-100>
-                输入         ->        <image_-100>
-                [gMASK]     ->        <image_-100>
-                <sop>       ->        _
-                ▁           ->         测试
-                测试         ->         输出
-                输出         ->         </s>
-                </s>        ->         <image_-100>
-                <pad>       ->         <image_-100>
-            
-            可运行下面代码打出结果：  
-
-            print(f'input_token -> label')
-            for input_token, label_token in zip(tokenizer.convert_ids_to_tokens(input_ids_with_padded),
-                                                tokenizer.convert_ids_to_tokens(labels)):
-                print(f'{input_token} -> {label_token}')
-            """
+            tokenized_output['input_ids'].append(input_ids)
+            tokenized_output['labels'].append(labels)
         except:
             print(f'"{example}" -> {traceback.format_exc()}')
             continue
 
-        tokenized_output['input_ids'].append(input_ids_with_padded)
-        tokenized_output['labels'].append(labels)
-    
     for k, v in tokenized_output.items():
         tokenized_output[k] = np.array(v)
 

@@ -22,12 +22,14 @@ Date: 2023/03/29
 
 Reference:
     https://github.com/mymusise/ChatGLM-Tuning
+    https://github.com/THUDM/ChatGLM-6B/blob/main/ptuning/main.py
 """
 import os
 import time
 import argparse
 from functools import partial
 
+import peft
 import torch
 import torch.nn as nn
 from datasets import load_dataset
@@ -41,7 +43,6 @@ from rich.table import Table
 from rich.align import Align
 from rich.console import Console
 
-from peft import get_peft_model, LoraConfig, TaskType
 from utils import convert_example
 from iTrainingLogger import iSummaryWriter
 
@@ -69,7 +70,13 @@ parser.add_argument("--save_freq", default=200, type=int, required=False, help="
 parser.add_argument("--logging_steps", default=10, type=int, help="log interval.")
 parser.add_argument("--img_log_dir", default='logs', type=str, help="Logging image path.")
 parser.add_argument("--img_log_name", default='Model Performance', type=str, help="Logging image file name.")
+parser.add_argument("--use_lora", default=False, type=bool, help="If use LoRA.")
+parser.add_argument("--use_ptuning", default=False, type=bool, help="If use P-Tuning.")
 parser.add_argument("--lora_rank", default=8, type=int, help="LoRA Rank.")
+parser.add_argument("--pre_seq_len", default=128, type=int, help="PTuning prefix tokens num.")
+parser.add_argument("--prefix_projection", default=False, type=bool, help="Use prefix projection or not.")
+parser.add_argument("--preprocessing_num_workers", default=1, type=int, help="Processing numbers for dataset process.")
+parser.add_argument("--quantization_bit", default=None, type=int, help="Quantization bit.")
 args = parser.parse_args()
 
 writer = iSummaryWriter(log_path=args.img_log_dir, log_name=args.img_log_name)
@@ -135,6 +142,30 @@ def reset_console():
     console.print(table_centered)
 
 
+def save_model(
+        model, 
+        cur_save_dir: str
+    ):
+    """
+    存储当前模型。
+
+    Args:
+        cur_save_path (str): 存储路径。
+    """
+    if args.use_lora:                       # merge lora params with origin model
+        key_list = [key for key, _ in model.base_model.model.named_modules() if "lora" not in key]
+        for key in key_list:
+            parent, target, target_name = model.base_model._get_submodules(key)
+            if isinstance(target, peft.tuners.lora.Linear):
+                bias = target.bias is not None
+                new_module = nn.Linear(target.in_features, target.out_features, bias=bias)
+                model.base_model._replace_module(parent, target_name, new_module, target)
+        model = model.base_model.model
+        model.save_pretrained(cur_save_dir)
+    else:
+        model.save_pretrained(cur_save_dir)
+
+
 def get_optimizer_and_scheler(model, train_dataloader):
     """
     刷新optimizer和lr衰减器。
@@ -178,33 +209,49 @@ def main():
         reset_console()
 
     accelerator = Accelerator()
-    tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True)
-    config = AutoConfig.from_pretrained(
+    
+    tokenizer = AutoTokenizer.from_pretrained(
         "THUDM/chatglm-6b", 
-        trust_remote_code=True, 
-        device_map='auto'
-    )
-    model = AutoModel.from_pretrained(
-        "THUDM/chatglm-6b",
-        load_in_8bit=False, 
         trust_remote_code=True
     )
+
+    config = AutoConfig.from_pretrained(
+        "THUDM/chatglm-6b", 
+        trust_remote_code=True
+    )
+    if args.use_ptuning:
+        config.pre_seq_len = args.pre_seq_len
+        config.prefix_projection = args.prefix_projection
+
+    model = AutoModel.from_pretrained(
+        "THUDM/chatglm-6b",
+        config=config,
+        trust_remote_code=True
+    )
+
+    if args.quantization_bit is not None:
+        print(f"Quantized to {args.quantization_bit} bit")
+        model = model.quantize(args.quantization_bit)
+
+    model = model.half()
     model.gradient_checkpointing_enable()
     model.enable_input_require_grads()
     model.is_parallelizable = True
     model.model_parallel = True
-    model.lm_head = CastOutputToFloat(model.lm_head)
     model.config.use_cache = False
+    if args.use_ptuning:
+        model.transformer.prefix_encoder.float()
 
-    # setup peft
-    peft_config = LoraConfig(
-        task_type=TaskType.CAUSAL_LM,
-        inference_mode=False,
-        r=args.lora_rank,
-        lora_alpha=32,
-        lora_dropout=0.1,
-    )
-    model = get_peft_model(model, peft_config)
+    if args.use_lora:
+        model.lm_head = CastOutputToFloat(model.lm_head)
+        peft_config = peft.LoraConfig(
+            task_type=peft.TaskType.CAUSAL_LM,
+            inference_mode=False,
+            r=args.lora_rank,
+            lora_alpha=32,
+            lora_dropout=0.1,
+        )
+        model = peft.get_peft_model(model, peft_config)
 
     # load dataset
     dataset = load_dataset('text', data_files={
@@ -217,11 +264,15 @@ def main():
     convert_func = partial(
         convert_example, 
         tokenizer=tokenizer, 
-        config=config,
         max_source_seq_len=args.max_source_seq_len,
         max_target_seq_len=args.max_target_seq_len,
     )
-    dataset = dataset.map(convert_func, batched=True)
+    
+    dataset = dataset.map(
+        convert_func, 
+        batched=True,
+        num_proc=args.preprocessing_num_workers
+    )
 
     train_dataset = dataset["train"]
     train_dataloader = DataLoader(
@@ -281,7 +332,8 @@ def main():
 
             if global_step % args.save_freq == 0 and local_rank == 0:
                 cur_save_dir = os.path.join(args.save_dir, "model_%d" % global_step)
-                model.module.save_pretrained(cur_save_dir)
+                save_model(model.module, cur_save_dir)
+                tokenizer.save_pretrained(cur_save_dir)
                 print(f'Model has saved at {cur_save_dir}.')
 
                 eval_loss = evaluate_model(model, eval_dataloader)
@@ -295,7 +347,8 @@ def main():
                     )
                     best_eval_loss = eval_loss
                     cur_save_dir = os.path.join(args.save_dir, "model_best")
-                    model.module.save_pretrained(cur_save_dir)
+                    save_model(model.module, cur_save_dir)
+                    tokenizer.save_pretrained(cur_save_dir)
                     print(f'Best model has saved at {cur_save_dir}.')
 
                 tic_train = time.time()

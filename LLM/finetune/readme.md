@@ -82,23 +82,46 @@ Instruction 部分告诉模型现在需要做「阅读理解」任务，Input �
 
 ### 3.1 单卡训练
 
+实验中支持使用 [LoRA Finetune](https://arxiv.org/abs/2106.09685) 和 [P-Tuning](https://github.com/THUDM/P-tuning-v2) 两种微调方式。
+
 运行 `train.sh` 文件，根据自己 GPU 的显存调节 `batch_size`, `max_source_seq_len`, `max_target_seq_len` 参数：
 
 ```sh
+# LoRA Finetune
 python train.py \
     --train_path data/mixed_train_dataset.jsonl \
     --dev_path data/mixed_dev_dataset.jsonl \
+    --use_lora True \
     --lora_rank 8 \
     --batch_size 1 \
-    --num_train_epochs 3 \
+    --num_train_epochs 2 \
     --save_freq 1000 \
     --learning_rate 3e-5 \
     --logging_steps 100 \
     --max_source_seq_len 400 \
     --max_target_seq_len 300 \
-    --save_dir checkpoints/ \
+    --save_dir checkpoints/finetune \
     --img_log_dir "log/fintune_log" \
     --img_log_name "ChatGLM Fine-Tune" \
+    --device cuda:0
+
+
+# P-Tuning
+python train.py \
+    --train_path data/mixed_train_dataset.jsonl \
+    --dev_path data/mixed_dev_dataset.jsonl \
+    --use_ptuning True \
+    --pre_seq_len 128 \
+    --batch_size 1 \
+    --num_train_epochs 2 \
+    --save_freq 200 \
+    --learning_rate 2e-4 \
+    --logging_steps 100 \
+    --max_source_seq_len 400 \
+    --max_target_seq_len 300 \
+    --save_dir checkpoints/ptuning \
+    --img_log_dir "log/fintune_log" \
+    --img_log_name "ChatGLM P-Tuning" \
     --device cuda:0
 ```
 
@@ -128,9 +151,11 @@ global step 1200 ( 66.52% ) , epoch: 2, loss: 0.62207, speed: 1.24 step/s, ETA: 
 运行 `train_multi_gpu.sh` 文件，通过 `CUDA_VISIBLE_DEVICES` 指定可用显卡，`num_processes` 指定使用显卡数：
 
 ```sh
+# LoRA Finetune
 CUDA_VISIBLE_DEVICES=0,1 accelerate launch --multi_gpu --mixed_precision=fp16 --num_processes=2 train_multi_gpu.py \
     --train_path data/mixed_train_dataset.jsonl \
     --dev_path data/mixed_dev_dataset.jsonl \
+    --use_lora True \
     --lora_rank 8 \
     --batch_size 1 \
     --num_train_epochs 2 \
@@ -139,9 +164,27 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch --multi_gpu --mixed_precision=fp16 --
     --logging_steps 100 \
     --max_source_seq_len 400 \
     --max_target_seq_len 300 \
-    --save_dir checkpoints_parrallel/ \
+    --save_dir checkpoints_parrallel/finetune \
     --img_log_dir "log/fintune_log" \
     --img_log_name "ChatGLM Fine-Tune(parallel)"
+
+
+# P-Tuning
+CUDA_VISIBLE_DEVICES=0,1 accelerate launch --multi_gpu --mixed_precision=fp16 --num_processes=2 train_multi_gpu.py \
+    --train_path data/mixed_train_dataset.jsonl \
+    --dev_path data/mixed_dev_dataset.jsonl \
+    --use_ptuning True \
+    --pre_seq_len 128 \
+    --batch_size 1 \
+    --num_train_epochs 2 \
+    --save_freq 500 \
+    --learning_rate 2e-4 \
+    --logging_steps 100 \
+    --max_source_seq_len 400 \
+    --max_target_seq_len 300 \
+    --save_dir checkpoints_parrallel/ptuning \
+    --img_log_dir "log/fintune_log" \
+    --img_log_name "ChatGLM P-Tuning(parallel)"
 ```
 
 相同数据集下，单卡使用时间：
@@ -165,8 +208,17 @@ Used 00:13:05.
 ```python
 device = 'cuda:0'
 max_new_tokens = 300
-peft_model_path = "checkpoints/model_1000"      # 训练模型存放路径
-config = PeftConfig.from_pretrained(peft_model_path)
+model_path = "checkpoints/model_1000"           # 模型存放路径
+
+tokenizer = AutoTokenizer.from_pretrained(
+    model_path, 
+    trust_remote_code=True
+)
+
+model = AutoModel.from_pretrained(
+    model_path,
+    trust_remote_code=True
+).half().to(device)
 ...
 ```
 

@@ -29,10 +29,7 @@ import datetime
 import torch
 import streamlit as st
 
-from peft import PeftModel, PeftConfig
-
-from transformers import AutoTokenizer
-from modeling_chatglm import ChatGLMForConditionalGeneration
+from transformers import AutoTokenizer, AutoModel
 
 torch.set_default_tensor_type(torch.cuda.HalfTensor)
 
@@ -45,7 +42,7 @@ st.set_page_config(
 
 device = 'cuda:0'
 max_new_tokens = 300
-peft_model_path = "checkpoints/model_1000"
+model_path = "checkpoints/model_1000"
 
 LOG_PATH = 'log'
 DATASET_PATH = 'data'
@@ -74,19 +71,14 @@ if 'model_out' not in st.session_state:
 
 if 'model' not in st.session_state:
     with st.spinner('Loading Model...'):
-        config = PeftConfig.from_pretrained(peft_model_path)
-        model = ChatGLMForConditionalGeneration.from_pretrained(
-            "THUDM/chatglm-6b", 
-            trust_remote_code=True
-        ).to(device)
-        model = PeftModel.from_pretrained(
-            model, 
-            peft_model_path
-        )
         tokenizer = AutoTokenizer.from_pretrained(
-            config.base_model_name_or_path, 
+            model_path, 
             trust_remote_code=True
         )
+        model = AutoModel.from_pretrained(
+            model_path,
+            trust_remote_code=True
+        ).half().to(device)
         st.session_state['model'] = model
         st.session_state['tokenizer'] = tokenizer
 
@@ -122,7 +114,6 @@ def start_evaluate_page():
                     batch = st.session_state['tokenizer'](input_text, return_tensors="pt")
                     out = model.generate(
                         input_ids=batch["input_ids"].to(device),
-                        attention_mask=torch.ones_like(batch["input_ids"]).bool().to(device),
                         max_new_tokens=max_new_tokens,
                         temperature=0
                     )
