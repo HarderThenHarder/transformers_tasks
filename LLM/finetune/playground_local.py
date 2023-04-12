@@ -112,7 +112,7 @@ def start_evaluate_page():
                     input_text += f"Input: {current_input}\n"
                     input_text += f"Answer:"
                     batch = st.session_state['tokenizer'](input_text, return_tensors="pt")
-                    out = model.generate(
+                    out = st.session_state['model'].generate(
                         input_ids=batch["input_ids"].to(device),
                         max_new_tokens=max_new_tokens,
                         temperature=0
