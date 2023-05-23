@@ -28,6 +28,7 @@ import datetime
 
 import torch
 import streamlit as st
+import pandas as pd
 
 from transformers import AutoTokenizer, AutoModel
 
