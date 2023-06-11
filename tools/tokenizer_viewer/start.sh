@@ -1,0 +1,1 @@
+streamlit run web_ui.py --server.port 8001

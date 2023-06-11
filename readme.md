@@ -108,3 +108,14 @@
 | 模型  | 传送门  |
 |---|---|
 | ChatGLM-6B | [[这里]](./LLM/finetune/readme.md) |
+
+
+<br>
+
+#### 9. 工具类（Tools）
+
+> 一些常用工具集合。
+
+| 工具名  | 传送门  |
+|---|---|
+| Tokenizer Viewer | [[这里]](./tools/tokenizer_viewer/readme.md) |
