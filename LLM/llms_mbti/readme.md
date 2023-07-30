@@ -1,6 +1,6 @@
 # 🧸 LLMs MBTI
 
-This repo is used for MBTI testing of LLM according to this [paper]().
+This repo is used for MBTI testing of LLM according to this [paper](assets/Do_LLMs_Possess_a_Personality__Making_the_MBTI_Test_an_Amazing_Evaluation_for_Large_Language_Models.pdf).
 
 ## 1. Install
 
