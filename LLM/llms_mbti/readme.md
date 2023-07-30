@@ -96,5 +96,7 @@ streamlit run web.py --server.port 8001
 
 then use `ip:port` (e.g. 127.0.0.1:8001) in browser to see this page.
 
-<img src="assets/mbti_visualization.png" width=500>
+<div align=center>
+<img src="assets/mbti_visualization.png">
+</div>
 
