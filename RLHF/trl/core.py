@@ -63,7 +63,7 @@ def whiten(values, shift_mean=True):
 
 def clip_by_value(x, tensor_min, tensor_max):
     """
-    Tensor extenstion to torch.clamp
+    Tensor extension to torch.clamp
     https://github.com/pytorch/pytorch/issues/2793#issuecomment-428784713
     """
     clipped = torch.max(torch.min(x, tensor_max), tensor_min)
