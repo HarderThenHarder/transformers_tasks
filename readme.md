@@ -90,13 +90,14 @@
 
 #### 7. 大模型应用（LLM Application）
 
-> 尝试构建大模型（LLM）zero-shot 解决多种任务所需的 prompt pattern(s)。
+> 构建大模型（LLM）zero-shot 解决多种任务所需的 prompt pattern(s)。
 
 | 模型  | 传送门  |
 |---|---|
 | 文本分类（chatglm-6b-Based） | [[这里]](./LLM/zero-shot/readme.md) |
 | 文本匹配（chatglm-6b-Based） | [[这里]](./LLM/zero-shot/readme.md) |
 | 信息抽取（chatglm-6b-Based） | [[这里]](./LLM/zero-shot/readme.md) |
+| 大模型性格测试（LLMs MBTI） | [[这里]](./LLM/llms_mbti/readme.md) |
 
 
 <br>
