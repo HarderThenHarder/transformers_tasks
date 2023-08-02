@@ -2,6 +2,8 @@
 
 LLMs Trainer 是一个旨在帮助人们从零开始训练大模型的仓库，该仓库最早参考自 [Open-Llama](https://github.com/beichao1314/Open-Llama)，并在其基础上进行扩充。
 
+<br>
+
 目前，该仓库将提供以下能力：
 
 - [x] 继续预训练（Continue Pretraining）
@@ -9,7 +11,11 @@ LLMs Trainer 是一个旨在帮助人们从零开始训练大模型的仓库，�
 - [x] 奖励模型训练（Reward Model）
 - [ ] 强化学习（Reinforcement Learning）
 
+<br>
+
 有关 LLM 训练流程的更多细节可以参考 [这篇文章](https://zhuanlan.zhihu.com/p/636270877)。
+
+<br>
 
 使用平台之前，先安装所有需要的依赖：
 
@@ -17,11 +23,14 @@ LLMs Trainer 是一个旨在帮助人们从零开始训练大模型的仓库，�
 pip install -r requirements.txt
 ```
 
+<br>
+
 ## 1. 继续预训练（Continue Pretraining）
 
 继续预训练是指，在一个已有的模型上继续进行预训练增强，通常用于 `英文模型的中文增强` 或是 `领域数据增强`。
 
 我们这里以英文模型 [OpenLlama](https://huggingface.co/openlm-research/open_llama_7b_v2) 在中文数据集 [MNBVC](https://huggingface.co/datasets/liwu/MNBVC) 中的 **少量数据** 为例来演示整个流程。
+
 
 ### 1.1 数据压缩
 
@@ -75,6 +84,8 @@ total files: 10
 
 随后可在 `pretrain_data` 中找到对应的 `.jsonl.zst` 压缩文件（该路径将在之后的训练中使用）。
 
+<br>
+
 ### 1.2 数据源采样比例（可选）
 
 为了更好的进行不同数据源的采样，我们提供了按照预设比例进行数据采样的功能。
@@ -100,6 +111,8 @@ streamlit run utils/sampler_viewer/web.py --server.port 8001
 <div align=center><img src='assets/sampler_viewer.jpeg'></div>
 
 调整完毕后，复制上图右下角的最终比例，便于后续训练使用。
+
+<br>
 
 ### 1.3 词表扩充（可选）
 
@@ -132,11 +145,15 @@ python merge_tokenizer.py
 
 你可以使用 [这个工具](https://github.com/HarderThenHarder/transformers_tasks/tree/main/tools/tokenizer_viewer) 很方便的对合并好后的 tokenizer 进行可视化。
 
+<br>
+
 ### 1.4 平均初始化 extend token embedding（可选）
 
 为了减小扩展的 token embedding 随机初始化带来模型性能的影响，我们提供使用将新 token 在原 tokenizer 中的 sub-token embedding 的平均值做为初始化 embedding 的方法。
 
 具体使用方法在 `utils/extend_model_token_embeddings.py`。
+
+<br>
 
 ### 1.5 正式训练
 
@@ -178,10 +195,13 @@ sh train_multi_node_reward_model.sh configs/accelerate_configs/ds_stage1.yaml \
 
 * `save_total_limit (int)`：最多保存的模型个数（超过数目则删除旧的模型）
 
+<br>
 
 ## 2. 指令微调（Instruction Tuning）
 
 我们准备了部分 `ShareGPT` 的数据作为示例数据，我们仍旧使用 [OpenLlama](https://huggingface.co/openlm-research/open_llama_7b_v2) 作为训练的基座模型。
+
+<br>
 
 ### 2.1 数据压缩
 
@@ -225,6 +245,7 @@ total files: 964
 
 随后可在 `sft_data` 中找到对应的 `.jsonl.zst` 压缩文件（该路径将在之后的训练中使用）。
 
+<br>
 
 ### 2.2 特殊 token 扩充
 
@@ -241,6 +262,8 @@ total files: 964
     "chat_end_token": "<|endofchat|>"           # chat end token
 }
 ```
+
+<br>
 
 ### 2.3 微调训练
 
@@ -280,8 +303,10 @@ sh train_multi_node_reward_model.sh configs/accelerate_configs/ds_stage1.yaml \
 
 * `save_total_limit (int)`：最多保存的模型个数（超过数目则删除旧的模型）
 
+<br>
 
 ## 3. 奖励模型（Reward Model）
+
 
 ### 3.1 数据集准备
 
@@ -296,6 +321,8 @@ sh train_multi_node_reward_model.sh configs/accelerate_configs/ds_stage1.yaml \
 ```
 
 这个步骤不再需要数据压缩，因此准备好上述结构的 `.jsonl` 文件即可。
+
+<br>
 
 ### 3.2 RM 训练
 
