@@ -4,7 +4,7 @@
 
 [![Author](https://img.shields.io/badge/Author-Pankeyu-green.svg "Author")](https://www.zhihu.com/column/c_1451236880973426688) [![OS](https://img.shields.io/badge/OS-Linux/Windows/Mac-red.svg "OS")](./) [![Based](https://img.shields.io/badge/Based-huggingface_transformers-blue.svg "OS")](./)
 
-[![Status](https://img.shields.io/badge/Status-WIP-darkslateblue.svg "Status")](./) [![Stars](https://img.shields.io/badge/Stars-370-yellow.svg "Stars")](./) [![Fork](https://img.shields.io/badge/Fork-77-sandybrown.svg "Stars")](./) [![Python](https://img.shields.io/badge/Python-3.6+-darkseagreen.svg "Python")](./)
+[![Status](https://img.shields.io/badge/Status-WIP-darkslateblue.svg "Status")](./) [![Stars](https://img.shields.io/badge/Stars-1.3k-yellow.svg "Stars")](./) [![Fork](https://img.shields.io/badge/Fork-271-sandybrown.svg "Stars")](./) [![Python](https://img.shields.io/badge/Python-3.6+-darkseagreen.svg "Python")](./)
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=200&color=1AF783&center=true&vCenter=true&width=435&lines=Transformers+>>>>>>>>>>+GO!)](https://git.io/typing-svg)
 
