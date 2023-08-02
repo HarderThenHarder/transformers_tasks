@@ -1,0 +1,40 @@
+data:
+  mode: "sft"
+  data: 
+    sharegpt: "data/sft_data/sharegpt/*.jsonl.zst"
+  pad_to_max: true
+  sequence_sample_mode: "truncation"
+  concat_multiple_sequence: false
+  num_sequences: 10
+  seq_length: 2048
+  tokenizer_path: "openlm-research/open_llama_7b_v2"
+  split_by_shard: false
+train:
+  train_batch_size: 1
+  num_training_steps: 50000
+  num_warmup_steps: 1000
+  initializer_range: 1.0e-2
+  lr: 1.0e-5
+  weight_decay: 1.0e-1
+  resize_model_vocab_size: true
+  ckpt: 'openlm-research/open_llama_7b_v2'
+  train_num_workers: 8
+  gradient_accumulation_steps: 30
+  prefetch_factor: 100
+  train_and_eval: true
+  gradient_checkpointing_enable: true
+  use_lora: false
+  target_modules: ['q_proj', 'v_proj']
+  save_total_limit: 3
+  img_log_dir: "log/sft/open_llama_7b_v2"
+  img_log_name: "ShareGPT OpenLlama7b-v2"
+eval:
+  eval_methods: ["generation_eval"]
+  generation_dataset:
+    share_gpt_test: "eval_data/sft/share_gpt_test.jsonl"
+  genration_eval_save_path: "eval_while_training/sft/sharegpt"
+# global step
+log_interval: 10
+eval_interval: 100
+save_interval: 100
+work_dir: "checkpoints/sft/ShareGPT"

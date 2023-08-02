@@ -1,0 +1,31 @@
+data:
+  reward_model_datasets: 
+    sentiment_comments: "data/reward_model_data/sentiment_comments.jsonl"
+  tokenizer_path: "openlm-research/open_llama_7b_v2"
+  seq_length: 2048
+  batch_size: 1
+  dataset_map_num_proc: 16
+train:
+  num_training_epochs: 1
+  initializer_range: 1.0e-2
+  lr: 1.0e-6
+  min_lr: 1.0e-7
+  weight_decay: 1.0e-1
+  ckpt: 'openlm-research/open_llama_7b_v2'
+  gradient_accumulation_steps: 1
+  train_and_eval: true
+  gradient_checkpointing_enable: true
+  downscale_weight: true
+  save_total_limit: 1
+  img_log_dir: "log/reward_model/llama7b"
+  img_log_name: "sentiment_comments"
+eval:
+  test_reward_model_acc_files: 
+    sentiment_comments_test: "eval_data/reward_model/sentiment_comments_test.jsonl"
+  save_delta_scores: false
+  delta_scores_save_path: "checkpoints/reward_model/llama7b/sentiment_comments"
+# global step
+log_interval: 10
+eval_interval: 10
+save_interval: 2000
+work_dir: "checkpoints/reward_model/llama7b/sentiment_comments"
