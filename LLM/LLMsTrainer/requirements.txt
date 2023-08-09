@@ -1,6 +1,5 @@
 absl_py==1.4.0
 datasets==2.10.1
-deepspeed==0.9.2
 matplotlib==3.7.1
 numpy==1.24.3
 peft==0.3.0
@@ -11,7 +10,9 @@ sentencepiece==0.1.99
 torch==2.0.0
 torchinfo==1.7.2
 tqdm==4.65.0
-transformers==4.29.1
+transformers==4.31.0
+accelerate==0.20.3
+deepspeed==0.10.0
 zstandard==0.21.0
 xformers==0.0.19
 streamlit==1.24.1
